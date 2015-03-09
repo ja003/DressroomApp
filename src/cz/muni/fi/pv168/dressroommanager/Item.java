@@ -21,8 +21,7 @@ public class Item  {
     private String note;
     private Closet closet;
 
-    public Item(Long id, String type, Gender gender, String size, String note ) {
-        this.id = id;
+    public Item(String type, Gender gender, String size, String note ) {
         this.type = type;
         this.gender = gender;
         this.size = size;

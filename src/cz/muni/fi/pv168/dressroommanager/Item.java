@@ -29,7 +29,61 @@ public class Item  {
         this.note = note;
     }
     
-    
+    public Item() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public void setCloset(Closet closet) {
+        this.closet = closet;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Date getAdded() {
+        return added;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public Closet getCloset() {
+        return closet;
+    }
     
     
     

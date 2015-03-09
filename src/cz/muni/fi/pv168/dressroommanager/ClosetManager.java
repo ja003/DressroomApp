@@ -22,4 +22,6 @@ public interface ClosetManager {
     
     public List<Closet> getAllClosets();
     
+    public void updateCloset(Closet closet);
+    
 }

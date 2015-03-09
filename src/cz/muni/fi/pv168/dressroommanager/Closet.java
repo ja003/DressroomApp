@@ -15,8 +15,7 @@ public class Closet {
     private String owner;
     private String name;
 
-    public Closet(Long id, String owner, String name){
-        this.id = id;
+    public Closet(String owner, String name){
         this.owner = owner;
         this.name = name;        
     }

@@ -29,4 +29,8 @@ public class ClosetManagerImpl implements ClosetManager
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    public void updateCloset(Closet closet)throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
 }

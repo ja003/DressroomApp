@@ -6,9 +6,14 @@
 
 package cz.muni.fi.pv168.dressroommanager;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,49 +25,24 @@ import static org.junit.Assert.*;
  */
 public class ClosetManagerImplTest {
     
-    public ClosetManagerImplTest() {
-    }
+    private ClosetManager manager;
     
-    @BeforeClass
-    public static void setUpClass() {
-    }
     
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of createCloset method, of class ClosetManagerImpl.
      */
     @Test
     public void testCreateCloset() {
-        System.out.println("createCloset");
-        Closet closet = null;
-        ClosetManagerImpl instance = new ClosetManagerImpl();
-        instance.createCloset(closet);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of deleteCloset method, of class ClosetManagerImpl.
-     */
-    @Test
-    public void testDeleteCloset() {
-        System.out.println("deleteCloset");
-        Closet closet = null;
-        ClosetManagerImpl instance = new ClosetManagerImpl();
-        instance.deleteCloset(closet);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Closet closet = new Closet("Adam","Adam - clsoet");
+        manager.createCloset(closet);
+        
+        Long closetId = closet.getId();
+        assertNotNull(closet);
+        Closet result = manager.getClosetById(closetId);
+        assertEquals(closet, result);
+        assertNotSame(closet, result);
+        assertDeepEquals(closet, result);
     }
 
     /**
@@ -85,13 +65,164 @@ public class ClosetManagerImplTest {
      */
     @Test
     public void testGetAllClosets() {
-        System.out.println("getAllClosets");
-        ClosetManagerImpl instance = new ClosetManagerImpl();
-        List<Closet> expResult = null;
-        List<Closet> result = instance.getAllClosets();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertTrue(manager.getAllClosets().isEmpty());
+
+        Closet c1 = new Closet("Adam","Adam - closet");
+        Closet c2 = new Closet("Bert","Bert - closet");
+
+        manager.createCloset(c1);
+        manager.createCloset(c2);
+
+        List<Closet> expected = Arrays.asList(c1,c2);
+        List<Closet> actual = manager.getAllClosets();
+
+        Collections.sort(actual,idComparator);
+        Collections.sort(expected,idComparator);
+
+        assertEquals(expected, actual);
+        assertDeepEquals(expected, actual);
     }
+    
+    public void addClosetWithWrongAttributes() {
+
+        try {
+            manager.createCloset(null);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+
+        Closet closet = new Closet("666", "666 - closet");
+        closet.setId(1l);
+        try {
+            manager.createCloset(closet);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+
+        closet = new Closet("", "Adam - closet"); 
+        try {
+            manager.createCloset(closet);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+
+        closet = new Closet("Adam", ""); 
+        try {
+            manager.createCloset(closet);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+
+        closet = new Closet("",""); 
+        try {
+            manager.createCloset(closet);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+
+        // these variants should be ok
+        closet = new Closet("Adam", "Adam - closet");
+        manager.createCloset(closet);
+        Closet result = manager.getClosetById(closet.getId()); 
+        assertNotNull(result);
+
+        closet = new Closet("Anca", "Anca - closet");
+        manager.createCloset(closet);
+        result = manager.getClosetById(closet.getId()); 
+        assertNotNull(result);
+
+        closet = new Closet("Me", "My closet");
+        manager.createCloset(closet);
+        result = manager.getClosetById(closet.getId()); 
+        assertNotNull(result);
+        assertNull(result.getOwner());
+
+    }
+    
+    
+    @Test
+    public void updateCloset() {
+        Closet closet = new Closet("Adam", "Adam - closet");
+        Closet c2 = new Closet("Adam", "Adam - imba closet");
+        manager.createCloset(closet);
+        manager.createCloset(c2);
+        Long closetId = closet.getId();
+
+        closet = manager.getClosetById(closetId);
+        closet.setOwner("");
+        manager.updateCloset(closet);        
+        assertEquals("", closet.getOwner());
+        assertEquals("Adam - closet", closet.getName());
+        
+        closet = manager.getClosetById(closetId);
+        closet.setOwner(null);
+        manager.updateCloset(closet);
+        assertNull(closet.getOwner());
+        assertEquals("Adam - closet", closet.getName());
+        
+        closet = manager.getClosetById(closetId);
+        closet.setName("");
+        manager.updateCloset(closet);        
+        assertEquals("Adam", closet.getOwner());
+        assertEquals("", closet.getName());
+
+        closet = manager.getClosetById(closetId);
+        closet.setName(null);
+        manager.updateCloset(closet);        
+        assertEquals("Adam", closet.getOwner());
+        assertNull(closet.getName());
+
+        // Check if updates didn't affected other records
+        assertDeepEquals(c2, manager.getClosetById(c2.getId()));
+    }
+    
+    @Test
+    public void deleteCloset() {
+
+        Closet c1 = new Closet("Adam", "Adam - closet");
+        Closet c2 = new Closet("Another", "Another - closet");
+        manager.createCloset(c1);
+        manager.createCloset(c2);
+        
+        assertNotNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+
+        manager.deleteCloset(c1);
+        
+        assertNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+                
+    }
+    
+    
+    ////////////////////////////////////////////
+    
+    
+    private void assertDeepEquals(List<Closet> expectedList, List<Closet> actualList) {
+        for (int i = 0; i < expectedList.size(); i++) {
+            Closet expected = expectedList.get(i);
+            Closet actual = actualList.get(i);
+            assertDeepEquals(expected, actual);
+        }
+    }
+     private void assertDeepEquals(Closet expected, Closet actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getOwner(), actual.getOwner());
+    }
+     
+    private static Comparator<Closet> idComparator = new Comparator<Closet>() {
+        @Override
+        public int compare(Closet o1, Closet o2) {
+            return Long.valueOf(o1.getId()).compareTo(Long.valueOf(o2.getId()));
+        }
+    };
+    
+    
     
 }

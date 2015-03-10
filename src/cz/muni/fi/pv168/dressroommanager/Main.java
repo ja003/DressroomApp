@@ -17,7 +17,7 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Item item = new Item((long)1,"shirt",Gender.FEMALE,"s","good");
+        Item item = new Item("shirt",Gender.FEMALE,"s","good");
         System.out.println(item.toString());
         
     }

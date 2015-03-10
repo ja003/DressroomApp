@@ -17,7 +17,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+
 
 /**
  *
@@ -43,6 +44,24 @@ public class ClosetManagerImplTest {
         assertEquals(closet, result);
         assertNotSame(closet, result);
         assertDeepEquals(closet, result);
+    }
+    
+    @Test
+    public void deleteCloset() {
+
+        Closet c1 = new Closet("Adam", "Adam - closet");
+        Closet c2 = new Closet("Another", "Another - closet");
+        manager.createCloset(c1);
+        manager.createCloset(c2);
+        
+        assertNotNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+
+        manager.deleteCloset(c1);
+        
+        assertNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+                
     }
 
     /**
@@ -82,6 +101,45 @@ public class ClosetManagerImplTest {
         assertEquals(expected, actual);
         assertDeepEquals(expected, actual);
     }
+    
+    
+    @Test
+    public void updateCloset() {
+        Closet closet = new Closet("Adam", "Adam - closet");
+        Closet c2 = new Closet("Adam", "Adam - imba closet");
+        manager.createCloset(closet);
+        manager.createCloset(c2);
+        Long closetId = closet.getId();
+
+        closet = manager.getClosetById(closetId);
+        closet.setOwner("");
+        manager.updateCloset(closet);        
+        assertEquals("", closet.getOwner());
+        assertEquals("Adam - closet", closet.getName());
+        
+        closet = manager.getClosetById(closetId);
+        closet.setOwner(null);
+        manager.updateCloset(closet);
+        assertNull(closet.getOwner());
+        assertEquals("Adam - closet", closet.getName());
+        
+        closet = manager.getClosetById(closetId);
+        closet.setName("");
+        manager.updateCloset(closet);        
+        assertEquals("Adam", closet.getOwner());
+        assertEquals("", closet.getName());
+
+        closet = manager.getClosetById(closetId);
+        closet.setName(null);
+        manager.updateCloset(closet);        
+        assertEquals("Adam", closet.getOwner());
+        assertNull(closet.getName());
+
+        // Check if updates didn't affected other records
+        assertDeepEquals(c2, manager.getClosetById(c2.getId()));
+    }
+    
+    ///all basic methods^^^^^^^^^
     
     public void addClosetWithWrongAttributes() {
 
@@ -145,59 +203,8 @@ public class ClosetManagerImplTest {
     }
     
     
-    @Test
-    public void updateCloset() {
-        Closet closet = new Closet("Adam", "Adam - closet");
-        Closet c2 = new Closet("Adam", "Adam - imba closet");
-        manager.createCloset(closet);
-        manager.createCloset(c2);
-        Long closetId = closet.getId();
-
-        closet = manager.getClosetById(closetId);
-        closet.setOwner("");
-        manager.updateCloset(closet);        
-        assertEquals("", closet.getOwner());
-        assertEquals("Adam - closet", closet.getName());
-        
-        closet = manager.getClosetById(closetId);
-        closet.setOwner(null);
-        manager.updateCloset(closet);
-        assertNull(closet.getOwner());
-        assertEquals("Adam - closet", closet.getName());
-        
-        closet = manager.getClosetById(closetId);
-        closet.setName("");
-        manager.updateCloset(closet);        
-        assertEquals("Adam", closet.getOwner());
-        assertEquals("", closet.getName());
-
-        closet = manager.getClosetById(closetId);
-        closet.setName(null);
-        manager.updateCloset(closet);        
-        assertEquals("Adam", closet.getOwner());
-        assertNull(closet.getName());
-
-        // Check if updates didn't affected other records
-        assertDeepEquals(c2, manager.getClosetById(c2.getId()));
-    }
     
-    @Test
-    public void deleteCloset() {
-
-        Closet c1 = new Closet("Adam", "Adam - closet");
-        Closet c2 = new Closet("Another", "Another - closet");
-        manager.createCloset(c1);
-        manager.createCloset(c2);
-        
-        assertNotNull(manager.getClosetById(c1.getId()));
-        assertNotNull(manager.getClosetById(c2.getId()));
-
-        manager.deleteCloset(c1);
-        
-        assertNull(manager.getClosetById(c1.getId()));
-        assertNotNull(manager.getClosetById(c2.getId()));
-                
-    }
+    
     
     
     ////////////////////////////////////////////

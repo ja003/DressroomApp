@@ -23,6 +23,7 @@ public class ItemsManagerImplTest {
     
     @Test
     public void createItem(){
+        //test if is in database
         System.out.println("test createItem");
         
         Item item = newItem(1L, "shirt", Gender.FEMALE, "XS", " ");

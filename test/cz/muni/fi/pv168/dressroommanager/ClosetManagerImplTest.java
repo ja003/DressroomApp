@@ -202,6 +202,51 @@ public class ClosetManagerImplTest {
 
     }
     
+    @Test
+    public void testUpdateCloset() throws SQLException {
+        Closet closet = new Closet("Name 1","closet number 1");
+        Closet closet2 = new Closet("Name 2","closet number 2");
+        manager.createCloset(closet);
+        manager.createCloset(closet2);
+        Long closetId = closet.getId();
+
+        closet = manager.getClosetById(closetId);
+        closet.setOwner("new owner 1");
+        manager.updateCloset(closet);
+        closet = manager.getClosetById(closetId);
+        assertEquals("new owner 1", closet.getName());
+        assertEquals("closet number 1", closet.getName());
+
+        closet = manager.getClosetById(closetId);
+        closet.setName("new name 1");
+        manager.updateCloset(closet);
+        closet = manager.getClosetById(closetId);
+        assertEquals("ClosetOne", closet.getName());
+        assertEquals("new owner 1", closet.getName());
+        assertEquals("new name 1", closet.getName());
+
+        // Check if updates didn't affected other records
+        assertDeepEquals(closet2, manager.getClosetById(closet2.getId()));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testDeleteClosetNullCloset() {
+        manager.deleteCloset(null);
+    }
+    
+    //    @Test(expected = IllegalArgumentException.class)
+//    public void testRemoveAirshipWrongId() {
+//        Airship airship = newAirship("AirshipOne", BigDecimal.valueOf(140), 50);
+//        airship.setId(1L);
+//        manager.removeAirship(airship);
+//    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testDeleteClosetNullId() {
+        Closet closet = new Closet("owner 1", "closet number 1");
+        closet.setId(null);
+        manager.deleteCloset(closet);
+    }
+    
     
     
     

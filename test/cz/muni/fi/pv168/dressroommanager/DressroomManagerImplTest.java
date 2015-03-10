@@ -49,7 +49,7 @@ public class DressroomManagerImplTest {
         fail("The test case is a prototype.");
     }
     
-    
+    //
     private void testGetAllItemsFromCloset(Closet closet){
         
         assertTrue(manager.getAllItemsFromCloset(closet).isEmpty());

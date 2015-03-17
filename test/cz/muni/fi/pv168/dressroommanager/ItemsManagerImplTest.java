@@ -39,52 +39,45 @@ public class ItemsManagerImplTest {
     }
     
     /**
+     * Another tests of createItem. Testing wrong attributes
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void createItemWithWrongAttributeNullItem(){
+        manager.createItem(null);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void createItemWithWrongAttributeNotNullId(){
+        Item item = newItem("socks", Gender.MALE, "39", "");
+        item.setId(2L);
+        manager.createItem(item);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void createItemWithWrongAttributesAllNull(){
+        Item item = newItem(null, null, null, null);
+        manager.createItem(item);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void createItemWithWrongAttributeNullType(){
+        Item item = newItem(null, Gender.BOTH, "S", "nice");
+        manager.createItem(item);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void createItemWithWrongAttributeType(){
+        Item item = newItem("", Gender.BOTH, "S", "nice");
+        manager.createItem(item);
+    }
+    
+    /**
      * Another test of createItem. Testing wrong attributes
      */
     @Test
     public void createItemWithWrongAttributes(){
-        try {
-            manager.createItem(null);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-        
-        Item item = newItem("socks", Gender.MALE, "39", "");
-        item.setId(2L);
-        try {
-            manager.createItem(item);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-        
-        item = newItem(null, null, null, null);
-        try {
-            manager.createItem(item);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-        
-        item = newItem(null, Gender.BOTH, "S", "nice");
-        try {
-            manager.createItem(item);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-        
-        item = newItem("", Gender.BOTH, "S", "nice");
-        try {
-            manager.createItem(item);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-        
         // these variants should be ok
-        item = newItem("socks", Gender.MALE, "39", "");
+        Item item = newItem("socks", Gender.MALE, "39", "");
         manager.createItem(item);
         Item result = manager.getItemById(item.getId());
         assertNotNull(result);

@@ -125,6 +125,7 @@ public class ClosetManagerImplTest {
         
         closet = manager.getClosetById(closetId);
         closet.setName("");
+        closet.setOwner("Adam");
         manager.updateCloset(closet);        
         assertEquals("Adam", closet.getOwner());
         assertEquals("", closet.getName());
@@ -135,56 +136,38 @@ public class ClosetManagerImplTest {
         assertEquals("Adam", closet.getOwner());
         assertNull(closet.getName());
 
-        // Check if updates didn't affected other records
+        // Check if updates haven't affected other records
         assertDeepEquals(c2, manager.getClosetById(c2.getId()));
     }
     
-    ///all basic methods^^^^^^^^^
-    
-    public void addClosetWithWrongAttributes() {
-
-        try {
-            manager.createCloset(null);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-
-        Closet closet = new Closet("666", "666 - closet");
-        closet.setId(1l);
-        try {
-            manager.createCloset(closet);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-
-        closet = new Closet("", "Adam - closet"); 
-        try {
-            manager.createCloset(closet);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-
-        closet = new Closet("Adam", ""); 
-        try {
-            manager.createCloset(closet);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-
-        closet = new Closet("",""); 
-        try {
-            manager.createCloset(closet);
-            fail();
-        } catch (IllegalArgumentException ex) {
-            //OK
-        }
-
-        // these variants should be ok
-        closet = new Closet("Adam", "Adam - closet");
+    ///not using try and catch block
+    @Test(expected = IllegalArgumentException.class )
+    public void addClosetWithNullAttribute() {
+        manager.createCloset(null);
+    }
+    @Test(expected = IllegalArgumentException.class )
+    public void addClosetWithWrongOwnerAttribute() {
+        Closet closet = new Closet("666", "666 - closet");        
+        manager.createCloset(closet);   //owner can not contain number
+    }
+    @Test(expected = IllegalArgumentException.class )
+    public void addClosetWithEmptyOwnerAttribute() {
+        Closet closet = new Closet("", "Adam - closet");         
+        manager.createCloset(closet);   //owner must be > 0
+    }
+    @Test(expected = IllegalArgumentException.class )
+    public void addClosetWithEmptyNameAttribute() {
+        Closet closet = new Closet("Adam", "");         
+        manager.createCloset(closet);   //name must be > 0
+    }
+    @Test(expected = IllegalArgumentException.class )
+    public void addClosetWithEmptyOwnerAndNameAttributes() {
+        Closet closet = new Closet("",""); 
+        manager.createCloset(closet);   //owner and name must be > 0
+    }
+    @Test       //these should be OK
+    public void addClosetWithOKAttributes() {
+        Closet closet = new Closet("Adam", "Adam - closet");
         manager.createCloset(closet);
         Closet result = manager.getClosetById(closet.getId()); 
         assertNotNull(result);
@@ -198,36 +181,9 @@ public class ClosetManagerImplTest {
         manager.createCloset(closet);
         result = manager.getClosetById(closet.getId()); 
         assertNotNull(result);
-        assertNull(result.getOwner());
-
     }
-    
-    @Test
-    public void testUpdateCloset() throws SQLException {
-        Closet closet = new Closet("Name 1","closet number 1");
-        Closet closet2 = new Closet("Name 2","closet number 2");
-        manager.createCloset(closet);
-        manager.createCloset(closet2);
-        Long closetId = closet.getId();
 
-        closet = manager.getClosetById(closetId);
-        closet.setOwner("new owner 1");
-        manager.updateCloset(closet);
-        closet = manager.getClosetById(closetId);
-        assertEquals("new owner 1", closet.getName());
-        assertEquals("closet number 1", closet.getName());
-
-        closet = manager.getClosetById(closetId);
-        closet.setName("new name 1");
-        manager.updateCloset(closet);
-        closet = manager.getClosetById(closetId);
-        assertEquals("ClosetOne", closet.getName());
-        assertEquals("new owner 1", closet.getName());
-        assertEquals("new name 1", closet.getName());
-
-        // Check if updates didn't affected other records
-        assertDeepEquals(closet2, manager.getClosetById(closet2.getId()));
-    }
+      
     
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteClosetNullCloset() {

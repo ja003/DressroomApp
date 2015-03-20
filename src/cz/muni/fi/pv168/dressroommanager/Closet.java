@@ -41,7 +41,7 @@ public class Closet {
     
     @Override
     public String toString() {
-        return "Closet{name=" + name + ", id=" + id + '}';
+        return "Closet{owner=" + owner + ", name=" + name + ", id=" + id + '}';
     }
     
     @Override

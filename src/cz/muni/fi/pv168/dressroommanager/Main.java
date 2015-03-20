@@ -20,6 +20,14 @@ public class Main {
         Item item = new Item("shirt",Gender.FEMALE,"s","good");
         System.out.println(item.toString());
         
+        ClosetManagerImpl manager = new ClosetManagerImpl();
+        Closet closet = new Closet();
+        closet.setOwner("Adam");
+        closet.setName("my closet");
+        System.out.println(closet.toString());
+        manager.createCloset(closet);
+        System.out.println(manager.getAllClosets().toString());
+        
     }
     
 }

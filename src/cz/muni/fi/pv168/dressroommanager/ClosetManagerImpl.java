@@ -44,10 +44,10 @@ public class ClosetManagerImpl implements ClosetManager
     @Override                                                               ///////////////CHECK...musí se použít ServiceFailureException???????????
     public void createCloset(Closet closet)throws ServiceFailureException {
         if (closet == null) {
-            throw new IllegalArgumentException("grave is null");
+            throw new IllegalArgumentException("closet is null");
         }
         if (closet.getId() != null) {
-            throw new IllegalArgumentException("grave id is already set");
+            throw new IllegalArgumentException("closet id is already set");
         }
         if (closet.getOwner().length() < 1) {
             throw new IllegalArgumentException("owner name is empty");

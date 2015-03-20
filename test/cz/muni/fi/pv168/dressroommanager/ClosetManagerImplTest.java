@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,7 +36,7 @@ public class ClosetManagerImplTest {
      */
     @Test
     public void testCreateCloset() {
-        Closet closet = newCloset("Adam","Adam - clsoet");
+        Closet closet = newCloset("Adam","Adam - closet");
         manager.createCloset(closet);
         
         Long closetId = closet.getId();
@@ -71,9 +72,8 @@ public class ClosetManagerImplTest {
     public void testGetClosetById() {
         System.out.println("getClosetById");
         Long id = null;
-        ClosetManagerImpl instance = new ClosetManagerImpl();
         Closet expResult = null;
-        Closet result = instance.getClosetById(id);
+        Closet result = manager.getClosetById(id);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -84,6 +84,7 @@ public class ClosetManagerImplTest {
      */
     @Test
     public void testGetAllClosets() {
+        System.out.println("Attempt to test get all airships");
         assertTrue(manager.getAllClosets().isEmpty());
 
         Closet c1 = newCloset("Adam","Adam - closet");

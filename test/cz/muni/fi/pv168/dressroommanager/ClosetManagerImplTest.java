@@ -35,7 +35,7 @@ public class ClosetManagerImplTest {
      */
     @Test
     public void testCreateCloset() {
-        Closet closet = new Closet("Adam","Adam - clsoet");
+        Closet closet = newCloset("Adam","Adam - clsoet");
         manager.createCloset(closet);
         
         Long closetId = closet.getId();
@@ -49,8 +49,8 @@ public class ClosetManagerImplTest {
     @Test
     public void deleteCloset() {
 
-        Closet c1 = new Closet("Adam", "Adam - closet");
-        Closet c2 = new Closet("Another", "Another - closet");
+        Closet c1 = newCloset("Adam", "Adam - closet");
+        Closet c2 = newCloset("Another", "Another - closet");
         manager.createCloset(c1);
         manager.createCloset(c2);
         
@@ -86,8 +86,8 @@ public class ClosetManagerImplTest {
     public void testGetAllClosets() {
         assertTrue(manager.getAllClosets().isEmpty());
 
-        Closet c1 = new Closet("Adam","Adam - closet");
-        Closet c2 = new Closet("Bert","Bert - closet");
+        Closet c1 = newCloset("Adam","Adam - closet");
+        Closet c2 = newCloset("Bert","Bert - closet");
 
         manager.createCloset(c1);
         manager.createCloset(c2);
@@ -105,8 +105,8 @@ public class ClosetManagerImplTest {
     
     @Test
     public void updateCloset() {
-        Closet closet = new Closet("Adam", "Adam - closet");
-        Closet c2 = new Closet("Adam", "Adam - imba closet");
+        Closet closet = newCloset("Adam", "Adam - closet");
+        Closet c2 = newCloset("Adam", "Adam - imba closet");
         manager.createCloset(closet);
         manager.createCloset(c2);
         Long closetId = closet.getId();
@@ -147,37 +147,37 @@ public class ClosetManagerImplTest {
     }
     @Test(expected = IllegalArgumentException.class )
     public void addClosetWithWrongOwnerAttribute() {
-        Closet closet = new Closet("666", "666 - closet");        
+        Closet closet = newCloset("666", "666 - closet");        
         manager.createCloset(closet);   //owner can not contain number
     }
     @Test(expected = IllegalArgumentException.class )
     public void addClosetWithEmptyOwnerAttribute() {
-        Closet closet = new Closet("", "Adam - closet");         
+        Closet closet = newCloset("", "Adam - closet");         
         manager.createCloset(closet);   //owner must be > 0
     }
     @Test(expected = IllegalArgumentException.class )
     public void addClosetWithEmptyNameAttribute() {
-        Closet closet = new Closet("Adam", "");         
+        Closet closet = newCloset("Adam", "");         
         manager.createCloset(closet);   //name must be > 0
     }
     @Test(expected = IllegalArgumentException.class )
     public void addClosetWithEmptyOwnerAndNameAttributes() {
-        Closet closet = new Closet("",""); 
+        Closet closet = newCloset("",""); 
         manager.createCloset(closet);   //owner and name must be > 0
     }
     @Test       //these should be OK
     public void addClosetWithOKAttributes() {
-        Closet closet = new Closet("Adam", "Adam - closet");
+        Closet closet = newCloset("Adam", "Adam - closet");
         manager.createCloset(closet);
         Closet result = manager.getClosetById(closet.getId()); 
         assertNotNull(result);
 
-        closet = new Closet("Anca", "Anca - closet");
+        closet = newCloset("Anca", "Anca - closet");
         manager.createCloset(closet);
         result = manager.getClosetById(closet.getId()); 
         assertNotNull(result);
 
-        closet = new Closet("Me", "My closet");
+        closet = newCloset("Me", "My closet");
         manager.createCloset(closet);
         result = manager.getClosetById(closet.getId()); 
         assertNotNull(result);
@@ -198,7 +198,7 @@ public class ClosetManagerImplTest {
 //    }
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteClosetNullId() {
-        Closet closet = new Closet("owner 1", "closet number 1");
+        Closet closet = newCloset("owner 1", "closet number 1");
         closet.setId(null);
         manager.deleteCloset(closet);
     }
@@ -210,6 +210,12 @@ public class ClosetManagerImplTest {
     
     ////////////////////////////////////////////
     
+    private static Closet newCloset(String owner, String name){
+        Closet closet = new Closet();
+        closet.setOwner(owner);
+        closet.setName(name);
+        return closet; 
+    }
     
     private void assertDeepEquals(List<Closet> expectedList, List<Closet> actualList) {
         for (int i = 0; i < expectedList.size(); i++) {

@@ -15,10 +15,16 @@ import org.junit.After;
 import org.junit.AfterClass;
 
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -27,8 +33,32 @@ import org.junit.Test;
  */
 public class ClosetManagerImplTest {
     
-    private ClosetManager manager;
+    private ClosetManagerImpl manager;
     
+    private DataSource dataSource;
+
+    @Before
+    public void setUp() throws SQLException {
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl("jdbc:derby:memory:ClosetManagerTest;create=true");
+        this.dataSource = bds;
+        //create new empty table before every test
+        try (Connection conn = bds.getConnection()) {
+            conn.prepareStatement("CREATE TABLE closet ("
+                    + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                    + "owner VARCHAR(255),"
+                    + "name VARCHAR(255),").executeUpdate();
+        }
+        
+        manager = new ClosetManagerImpl(bds);
+    }
+
+    @After
+    public void tearDown() throws SQLException {
+        try (Connection con = dataSource.getConnection()) {
+            con.prepareStatement("DROP TABLE CLOSET").executeUpdate();
+        }
+    }
     
 
     /**

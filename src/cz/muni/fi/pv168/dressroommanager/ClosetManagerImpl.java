@@ -61,6 +61,9 @@ public class ClosetManagerImpl implements ClosetManager
         if (closet.getName().length() < 1) {
             throw new IllegalArgumentException("closet name is empty");
         }
+        if(closet.getOwner().matches(".*\\d.*")){
+            throw new IllegalArgumentException("owner contains number");
+        }
 
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement st = conn.prepareStatement("INSERT INTO CLOSET (owner,name) VALUES (?,?)",
@@ -69,7 +72,7 @@ public class ClosetManagerImpl implements ClosetManager
                 st.setString(2, closet.getName());
                 int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
-                    throw new ServiceFailureException("Internal Error: More rows inserted when trying to insert grave " + closet);
+                    throw new ServiceFailureException("Internal Error: More rows inserted when trying to insert closet " + closet);
                 }
                 ResultSet keyRS = st.getGeneratedKeys();
                 keyRS.next();
@@ -163,12 +166,12 @@ public class ClosetManagerImpl implements ClosetManager
     }
     
     @Override
-    public void updateCloset(Closet closet) {
+    public void updateCloset(Closet closet) throws ServiceFailureException {
         if (closet == null) {
-            throw new IllegalArgumentException("grave is null");
+            throw new IllegalArgumentException("closet is null");
         }
-        if (closet.getId() != null) {
-            throw new IllegalArgumentException("grave id is already set");
+        if (closet.getId() == null) {
+            throw new IllegalArgumentException("closet with null id cannot be updated");
         }
         if (closet.getOwner().length() < 1) {
             throw new IllegalArgumentException("owner name is empty");
@@ -180,16 +183,16 @@ public class ClosetManagerImpl implements ClosetManager
         
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement st = connection.prepareStatement("UPDATE closet SET "
-                    + "owner = ?, name = ? WHERE id = ?")) {
+                    + "owner=?, name=? WHERE id=?")) {
                 st.setString(1, closet.getOwner());
                 st.setString(2, closet.getName());
                 st.setLong(3, closet.getId());
                 if(st.executeUpdate()!=1) {
-                    throw new IllegalArgumentException("cannot update grave "+closet);
+                    throw new IllegalArgumentException("cannot update closet "+closet);
                 }
             }
         } catch (SQLException ex) {
-            //log.error(ex.toString());
+            throw new ServiceFailureException("Error when updating closet", ex);
         }
     }
     

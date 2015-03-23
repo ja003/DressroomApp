@@ -69,7 +69,7 @@ public class ClosetManagerImplTest {
     @Before
     public void setUp() throws SQLException {
         BasicDataSource bds = new BasicDataSource();
-        bds.setUrl("jdbc:derby://localhost:1527/Closet/GraveManagerTest;create=true");
+        bds.setUrl("jdbc:derby://localhost:1527/DressroomDB/ClosetManagerTest;create=true");
         this.dataSource = bds;
         //create new empty table before every test
         try (Connection conn = bds.getConnection()) {

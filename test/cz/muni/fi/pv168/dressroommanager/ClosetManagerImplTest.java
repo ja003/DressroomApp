@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -37,20 +38,50 @@ public class ClosetManagerImplTest {
     
     private DataSource dataSource;
 
+    /*
+    @Before
+    public void setUp() throws SQLException {
+        Connection conn = null;
+        String url = "jdbc:derby://localhost:1527/";
+        String dbName = "Closet";
+        String driver = "org.apache.derby.jdbc.ClientDriver";
+        //String userName = "root";
+        //String password = "root";
+        try{
+            Class.forName(driver).newInstance();
+            conn = DriverManager.getConnection(url+dbName);
+            System.out.println("copnnected to db");
+            conn.prepareStatement("CREATE TABLE GRAVE ("
+                        + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                        + "col INT,"
+                        + "row INT,"
+                        + "capacity INT NOT NULL,"
+                        + "note VARCHAR(255))").executeUpdate();
+
+            conn.close();
+            System.out.println("disconnected to db");
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    */
+    
     @Before
     public void setUp() throws SQLException {
         BasicDataSource bds = new BasicDataSource();
-        bds.setUrl("jdbc:derby:memory:ClosetManagerTest;create=true");
+        bds.setUrl("jdbc:derby://localhost:1527/Closet/GraveManagerTest;create=true");
         this.dataSource = bds;
         //create new empty table before every test
         try (Connection conn = bds.getConnection()) {
-            conn.prepareStatement("CREATE TABLE closet ("
+            conn.prepareStatement("CREATE TABLE CLOSET ("
                     + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                     + "owner VARCHAR(255),"
-                    + "name VARCHAR(255),").executeUpdate();
+                    + "name VARCHAR(255))").executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        
         manager = new ClosetManagerImpl(bds);
+        
     }
 
     @After

@@ -17,8 +17,8 @@ import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class ClosetManagerImpl implements ClosetManager
 {
     private DataSource dataSource;
-    private final Logger log = LoggerFactory.getLogger(ClosetManagerImpl.class);
+    //private final Logger //log = LoggerFactory.getLogger(ClosetManagerImpl.class);
 
     public ClosetManagerImpl( ) {}
     public ClosetManagerImpl(DataSource dataSource) {
@@ -76,7 +76,7 @@ public class ClosetManagerImpl implements ClosetManager
                 closet.setId(keyRS.getLong(1));
             }
         } catch (SQLException ex) {
-            log.error("db connection problem", ex);
+            //log.error("db connection problem", ex);
             throw new ServiceFailureException("Error when retrieving the closet", ex);
         }
     }
@@ -110,7 +110,7 @@ public class ClosetManagerImpl implements ClosetManager
         if (closet.getId() == null) {
             throw new IllegalArgumentException("Id is null");
         }
-        log.info("Attempt to remove airship: "+closet.toString());
+        //log.info("Attempt to remove airship: "+closet.toString());
         
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement st = connection.prepareStatement("DELETE FROM closet WHERE id = ?")) {
@@ -118,13 +118,13 @@ public class ClosetManagerImpl implements ClosetManager
                 st.execute();
             }
         } catch (SQLException ex) {
-            log.error(ex.toString());
+            //log.error(ex.toString());
         }
     }
     
     @Override
     public Closet getClosetById(Long id)throws ServiceFailureException {
-        log.info("Attempt to get closet by id with given id: "+id.toString());
+        //log.info("Attempt to get closet by id with given id: "+id.toString());
         
         if (id == null) {
             throw new IllegalArgumentException("Id is null");
@@ -139,14 +139,14 @@ public class ClosetManagerImpl implements ClosetManager
                 }
             }
         } catch (SQLException ex) {
-            log.error(ex.toString());
+            //log.error(ex.toString());
         }
         return closet;
     }
     
     @Override
     public List<Closet> getAllClosets() {
-        log.info("Attempt to get all airships");
+        //log.info("Attempt to get all airships");
         
         List<Closet> closets = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
@@ -157,7 +157,7 @@ public class ClosetManagerImpl implements ClosetManager
                 }
             }
         } catch (SQLException ex) {
-            log.error(ex.toString());
+            //log.error(ex.toString());
         }
         return closets;
     }
@@ -176,7 +176,7 @@ public class ClosetManagerImpl implements ClosetManager
         if (closet.getName().length() < 1) {
             throw new IllegalArgumentException("closet name is empty");
         }
-        log.info("Attempt to edit airship: "+closet.toString());
+        //log.info("Attempt to edit airship: "+closet.toString());
         
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement st = connection.prepareStatement("UPDATE closet SET "
@@ -189,7 +189,7 @@ public class ClosetManagerImpl implements ClosetManager
                 }
             }
         } catch (SQLException ex) {
-            log.error(ex.toString());
+            //log.error(ex.toString());
         }
     }
     

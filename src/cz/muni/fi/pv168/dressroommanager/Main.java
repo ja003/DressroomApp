@@ -9,6 +9,7 @@ package cz.muni.fi.pv168.dressroommanager;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 
 /**
@@ -17,12 +18,26 @@ import org.apache.commons.dbcp.BasicDataSource;
  */
 public class Main {
 
+    private ClosetManagerImpl manager;
+    
+    private DataSource dataSource;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws SQLException{
         // TODO code application logic here
+        
+        //testing database
+        TryDB db = new TryDB();
+        db.start();
+                
+        
+    }
+    
         /*
+    public void start(){
+        //setUp();
+        
         Item item = new Item("shirt",Gender.FEMALE,"s","good");
         System.out.println(item.toString());
         
@@ -33,30 +48,24 @@ public class Main {
         System.out.println(closet.toString());
         manager.createCloset(closet);
         System.out.println(manager.getAllClosets().toString());
-                */
-        
-        //setUp();
-        
-        myJDBCApp();
         
     }
     
-    public static void setUp() throws SQLException {
+    public void setUp() throws SQLException {
         BasicDataSource bds = new BasicDataSource();
-        //bds.setUrl("jdbc:derby:memory:ClosetManagerTest;create=true");
-        bds.setUrl("jdbc:derby://localhost:1527/myDB;create=true");
-        //this.dataSource = bds;
+        //bds.setUrl("jdbc:derby://localhost:1527/DressroomDB/ClosetManagerTest;create=true");
+        bds.setUrl("jdbc:derby:memory:ClosetManagerTest;create=true");                                      //not sure how this works
+        this.dataSource = bds;
         //create new empty table before every test
         try (Connection conn = bds.getConnection()) {
-            conn.prepareStatement("CREATE TABLE closet ("
+            conn.prepareStatement("CREATE TABLE CLOSET ("
                     + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                     + "owner VARCHAR(255),"
-                    + "name VARCHAR(255),").executeUpdate();
-        }catch(SQLException e){
+                    + "name VARCHAR(255))").executeUpdate();
+        }catch(Exception e){
             e.printStackTrace();
         }
-        
-        //manager = new ClosetManagerImpl(bds);
+        manager = new ClosetManagerImpl(bds);
         
     }
     
@@ -85,7 +94,7 @@ public class Main {
     }
 }
 
-    
+    */
     
     
 }

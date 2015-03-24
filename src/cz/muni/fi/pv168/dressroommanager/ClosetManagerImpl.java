@@ -30,6 +30,7 @@ public class ClosetManagerImpl implements ClosetManager
     //private final Logger //log = LoggerFactory.getLogger(ClosetManagerImpl.class);
 
     public ClosetManagerImpl( ) {}
+    
     public ClosetManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -75,8 +76,9 @@ public class ClosetManagerImpl implements ClosetManager
                     throw new ServiceFailureException("Internal Error: More rows inserted when trying to insert closet " + closet);
                 }
                 ResultSet keyRS = st.getGeneratedKeys();
-                keyRS.next();
-                closet.setId(keyRS.getLong(1));
+                //keyRS.next();
+                //closet.setId(keyRS.getLong(1));
+                closet.setId(getKey(keyRS,closet));
             }
         } catch (SQLException ex) {
             //log.error("db connection problem", ex);

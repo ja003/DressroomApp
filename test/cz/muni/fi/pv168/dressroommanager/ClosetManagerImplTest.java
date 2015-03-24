@@ -38,39 +38,12 @@ public class ClosetManagerImplTest {
     
     private DataSource dataSource;
 
-    /*
-    @Before
-    public void setUp() throws SQLException {
-        Connection conn = null;
-        String url = "jdbc:derby://localhost:1527/";
-        String dbName = "Closet";
-        String driver = "org.apache.derby.jdbc.ClientDriver";
-        //String userName = "root";
-        //String password = "root";
-        try{
-            Class.forName(driver).newInstance();
-            conn = DriverManager.getConnection(url+dbName);
-            System.out.println("copnnected to db");
-            conn.prepareStatement("CREATE TABLE GRAVE ("
-                        + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
-                        + "col INT,"
-                        + "row INT,"
-                        + "capacity INT NOT NULL,"
-                        + "note VARCHAR(255))").executeUpdate();
-
-            conn.close();
-            System.out.println("disconnected to db");
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-    */
     
     @Before
     public void setUp() throws SQLException {
         BasicDataSource bds = new BasicDataSource();
-        //bds.setUrl("jdbc:derby://localhost:1527/DressroomDB/ClosetManagerTest;create=true");
-        bds.setUrl("jdbc:derby:memory:ClosetManagerTest;create=true");                                      //not sure how this works
+        bds.setUrl("jdbc:derby://localhost:1527/DressroomDB;create=true");
+        //bds.setUrl("jdbc:derby:memory;create=true");                                      //not sure how this works
         this.dataSource = bds;
         //create new empty table before every test
         try (Connection conn = bds.getConnection()) {
@@ -79,6 +52,7 @@ public class ClosetManagerImplTest {
                     + "owner VARCHAR(255),"
                     + "name VARCHAR(255))").executeUpdate();
         }catch(Exception e){
+            System.out.println("error");            
             e.printStackTrace();
         }
         manager = new ClosetManagerImpl(bds);

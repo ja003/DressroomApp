@@ -6,6 +6,10 @@
 
 package cz.muni.fi.pv168.dressroommanager;
 
+import cz.muni.fi.pv168.common.ValidationException;
+import cz.muni.fi.pv168.common.IllegalEntityException;
+import cz.muni.fi.pv168.common.DBUtils;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,38 +39,27 @@ import org.junit.Test;
 public class ClosetManagerImplTest {
     
     private ClosetManagerImpl manager;
-    
-    private DataSource dataSource;
+    private DataSource ds;
 
-    
+    private static DataSource prepareDataSource() throws SQLException {
+        BasicDataSource ds = new BasicDataSource();
+        //we will use in memory database
+        ds.setUrl("jdbc:derby:memory:closetmgr-test;create=true");
+        return ds;
+    }
+
     @Before
     public void setUp() throws SQLException {
-        BasicDataSource bds = new BasicDataSource();
-        bds.setUrl("jdbc:derby://localhost:1527/DressroomDB;create=true");
-        //bds.setUrl("jdbc:derby:memory;create=true");                                      //not sure how this works
-        this.dataSource = bds;
-        //create new empty table before every test
-        try (Connection conn = bds.getConnection()) {
-            conn.prepareStatement("CREATE TABLE CLOSET ("
-                    + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
-                    + "owner VARCHAR(255),"
-                    + "name VARCHAR(255))").executeUpdate();
-        }catch(Exception e){
-            System.out.println("error");            
-            e.printStackTrace();
-        }
-        manager = new ClosetManagerImpl(bds);
-        
-    }
-
-    @After
-    public void tearDown() throws SQLException {
-        try (Connection con = dataSource.getConnection()) {
-            con.prepareStatement("DROP TABLE CLOSET").executeUpdate();
-        }
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds,ClosetManager.class.getResource("createTables.sql"));
+        manager = new ClosetManagerImpl();
+        manager.setDataSource(ds);
     }
     
-
+    @After
+    public void tearDown() throws SQLException {
+        DBUtils.executeSqlScript(ds,ClosetManager.class.getResource("dropTables.sql"));
+    }
     /**
      * Test of createCloset method, of class ClosetManagerImpl.
      */
@@ -85,7 +78,6 @@ public class ClosetManagerImplTest {
     
     @Test
     public void deleteCloset() {
-
         Closet c1 = newCloset("Adam", "Adam - closet");
         Closet c2 = newCloset("Another", "Another - closet");
         manager.createCloset(c1);
@@ -101,9 +93,6 @@ public class ClosetManagerImplTest {
                 
     }
 
-    /**
-     * Test of getClosetById method, of class ClosetManagerImpl.
-     */
     @Test
     public void testGetClosetById() {
         assertNull(manager.getClosetById(1L));
@@ -115,16 +104,6 @@ public class ClosetManagerImplTest {
         Closet result = manager.getClosetById(closetId);
         assertEquals(closet, result);
         assertDeepEquals(closet, result);
-        ///
-        /*
-        System.out.println("getClosetById");
-        Long id = null;
-        Closet expResult = null;
-        Closet result = manager.getClosetById(id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-        */
     }
 
     /**
@@ -165,24 +144,13 @@ public class ClosetManagerImplTest {
         manager.updateCloset(closet);        
         assertEquals("a", closet.getOwner());
         assertEquals("Adam - closet", closet.getName());
-        
-        /*
-        closet = manager.getClosetById(closetId);
-        closet.setOwner(null);
-        manager.updateCloset(closet);
-        assertNull(closet.getOwner());
-        assertEquals("Adam - closet", closet.getName());
-        */
-        
+       
         closet = manager.getClosetById(closetId);
         closet.setName("c");
         closet.setOwner("Adam");
         manager.updateCloset(closet);        
         assertEquals("Adam", closet.getOwner());
         assertEquals("c", closet.getName());
-
-        
-
         // Check if updates haven't affected other records
         assertDeepEquals(c2, manager.getClosetById(c2.getId()));
     }
@@ -192,22 +160,22 @@ public class ClosetManagerImplTest {
     public void addClosetWithNullAttribute() {
         manager.createCloset(null);
     }
-    @Test(expected = IllegalArgumentException.class )
+    @Test(expected = ValidationException.class )
     public void addClosetWithWrongOwnerAttribute() {
         Closet closet = newCloset("666", "666 - closet");        
         manager.createCloset(closet);   //owner can not contain number
     }
-    @Test(expected = IllegalArgumentException.class )
+    @Test(expected = ValidationException.class )
     public void addClosetWithEmptyOwnerAttribute() {
         Closet closet = newCloset("", "Adam - closet");         
         manager.createCloset(closet);   //owner must be > 0
     }
-    @Test(expected = IllegalArgumentException.class )
+    @Test(expected = ValidationException.class )
     public void addClosetWithEmptyNameAttribute() {
         Closet closet = newCloset("Adam", "");         
         manager.createCloset(closet);   //name must be > 0
     }
-    @Test(expected = IllegalArgumentException.class )
+    @Test(expected = ValidationException.class )
     public void addClosetWithEmptyOwnerAndNameAttributes() {
         Closet closet = newCloset("",""); 
         manager.createCloset(closet);   //owner and name must be > 0
@@ -237,12 +205,6 @@ public class ClosetManagerImplTest {
         manager.deleteCloset(null);
     }
     
-    //    @Test(expected = IllegalArgumentException.class)
-//    public void testRemoveAirshipWrongId() {
-//        Airship airship = newAirship("AirshipOne", BigDecimal.valueOf(140), 50);
-//        airship.setId(1L);
-//        manager.removeAirship(airship);
-//    }
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteClosetNullId() {
         Closet closet = newCloset("owner 1", "closet number 1");
@@ -251,11 +213,7 @@ public class ClosetManagerImplTest {
     }
     
     
-    
-    
-    
-    
-    ////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     private static Closet newCloset(String owner, String name){
         Closet closet = new Closet();
@@ -283,7 +241,5 @@ public class ClosetManagerImplTest {
             return Long.valueOf(o1.getId()).compareTo(Long.valueOf(o2.getId()));
         }
     };
-    
-    
-    
+     
 }

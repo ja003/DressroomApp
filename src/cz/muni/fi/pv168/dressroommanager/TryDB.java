@@ -6,10 +6,12 @@
 
 package cz.muni.fi.pv168.dressroommanager;
 
+import cz.muni.fi.pv168.common.DBUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
 
 /**
  *
@@ -18,7 +20,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 public class TryDB {
     
 private ClosetManagerImpl manager;
-
+    private DataSource ds;
 
 public TryDB(){
     
@@ -30,7 +32,7 @@ public void start() throws SQLException{
 
 
     Closet closet = new Closet();
-    closet.setOwner("Adam3");
+    closet.setOwner("Adamm");
     closet.setName("my closet3");
     System.out.println(closet.toString());
     manager.createCloset(closet);
@@ -46,7 +48,21 @@ public void start() throws SQLException{
     System.out.println("get all closets" + manager.getAllClosets().toString());
 
 }
+    private static DataSource prepareDataSource() throws SQLException {
+        BasicDataSource ds = new BasicDataSource();
+        //we will use in memory database
+        ds.setUrl("jdbc:derby:memory:closetmgr-test;create=true");
+        return ds;
+    }
 
+public void setUp() throws SQLException {
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds,ClosetManager.class.getResource("createTables.sql"));
+        manager = new ClosetManagerImpl();
+        manager.setDataSource(ds);
+    }
+
+/*
 public  void setUp() throws SQLException {
     BasicDataSource bds = new BasicDataSource();
     bds.setUrl("jdbc:derby://localhost:1527/DressroomDB;create=true");
@@ -64,5 +80,6 @@ public  void setUp() throws SQLException {
     manager = new ClosetManagerImpl(bds);
 
 }
+*/
     
 }

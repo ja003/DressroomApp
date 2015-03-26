@@ -36,7 +36,7 @@ public class ClosetManagerImpl implements ClosetManager
     private static final Logger logger = Logger.getLogger(
             ClosetManagerImpl.class.getName());
 
-    public ClosetManagerImpl( ) {}
+    public ClosetManagerImpl() {}
     
     public ClosetManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;

@@ -267,4 +267,14 @@ public class ItemsManagerImpl implements ItemsManager{
         
         return item;
     }
+    
+        
+    static List<Item> executeQueryForMultipleItems(PreparedStatement st) throws SQLException {
+        ResultSet rs = st.executeQuery();
+        List<Item> result = new ArrayList<Item>();
+        while (rs.next()) {
+            result.add(resultSetToItem(rs));
+        }
+        return result;
+    }
 }

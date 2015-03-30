@@ -6,10 +6,14 @@
 
 package cz.muni.fi.pv168.dressroommanager;
 
+import cz.muni.fi.pv168.common.DBUtils;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.sql.DataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -23,62 +27,171 @@ import org.junit.Test;
  */
 public class DressroomManagerImplTest {
     private DressroomManagerImpl manager;
-    
+    private ItemsManagerImpl itemsManager;
+    private ClosetManagerImpl closetManager;
+    private DataSource ds;
+            
+    /*
     public DressroomManagerImplTest() {
     }
+    */
     
-    @BeforeClass
-    public static void setUpClass() {
+    private static DataSource prepareDataSource() throws SQLException{
+        BasicDataSource ds = new BasicDataSource();
+        //we will use in memory database
+        ds.setUrl("jdbc:derby:memory:dressroom-test;create=true");
+        //ds.setUrl("jdbc:derby://localhost:1527/test");
+        return ds;
     }
     
-    @AfterClass
-    public static void tearDownClass() {
+    private Closet c1, c2, c3, closetWithNullId, closetWithNoItem, fakeCloset;
+    private Item i1, i2, i3, i4;
+    
+    
+    private void prepareTestData(){
+        c1 = newCloset("Anna", "Closet_01");
+        c2 = newCloset("Adam", "Closet_02");
+        c3 = newCloset("Tomas", "Closet_03");        
+        fakeCloset = newCloset("fake", "fake");
+        closetWithNoItem = newCloset("Petr", "Closet_05");
+
+        closetWithNullId = newCloset("Pavel", "Closet_04");
+        
+        i1 = newItem("shirt 1", Gender.BOTH, "M", null, fakeCloset);
+        i2 = newItem("shirt 2", Gender.FEMALE, null, "beautiful", fakeCloset);
+        i3 = newItem("shirt 3", Gender.MALE, "XXl", "with awesome unicorn", fakeCloset);
+        i4 = newItem("shirt 1", Gender.MALE, null, null, fakeCloset);
+        
+        closetManager.createCloset(fakeCloset);
+
+        
+        itemsManager.createItem(i1);
+        itemsManager.createItem(i2);
+        itemsManager.createItem(i3);
+        itemsManager.createItem(i4);
+        
+        closetManager.createCloset(c1);
+        closetManager.createCloset(c2);
+        closetManager.createCloset(c3);
+        closetManager.createCloset(closetWithNoItem);
+        
+        //a dalsi s nullId nebo notInDB
+        /*
+        graveWithNullId = newGrave(1,1,1,"Grave with null id");
+        graveNotInDB = newGrave(1,1,1,"Grave not in DB");
+        graveNotInDB.setId(g3.getId() + 100);
+        bodyWithNullId = newBody("Body with null id", null, null, true);
+        bodyNotInDB = newBody("Body not in DB", null, null, true);
+        bodyNotInDB.setId(b5.getId() + 100);
+        */
     }
     
     @Before
-    public void setUp() {
+    public void setUpClass() throws SQLException {
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds, ClosetManager.class.getResource("createTables.sql"));
+        manager = new DressroomManagerImpl();
+        manager.setDataSource(ds);
+        itemsManager = new ItemsManagerImpl();
+        itemsManager.setDataSource(ds);
+        closetManager = new ClosetManagerImpl();
+        closetManager.setDataSource(ds);
+        prepareTestData();
     }
     
     @After
-    public void tearDown() {
+    public void tearDown() throws SQLException {
+        DBUtils.executeSqlScript(ds, ClosetManager.class.getResource("dropTables.sql"));
     }
 
-    @Test
-    public void testSomeMethod() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
     //
-    private void testGetAllItemsFromCloset(Closet closet){
+    @Test
+    public void testGetAllItemsFromCloset(){
+        assertTrue(manager.getAllItemsFromCloset(closetWithNoItem).isEmpty());
+        manager.putItemInCloset(i1, closetWithNoItem);
+        manager.putItemInCloset(i2, closetWithNoItem);
         
-        assertTrue(manager.getAllItemsFromCloset(closet).isEmpty());
-
-        
-        Item item = new Item("shirt",Gender.BOTH,"s","my shirt");
-        Item item2 = new Item("pants",Gender.MALE,"42","my pants");
-
-        manager.putItemInCloset(item, closet);
-        manager.putItemInCloset(item2, closet);
-        
-        List<Item> expected = Arrays.asList(item, item2);
-        List<Item> actual = manager.getAllItemsFromCloset(closet);
+        List<Item> expected = Arrays.asList(i1, i2);
+        List<Item> actual = manager.getAllItemsFromCloset(closetWithNoItem);
         Collections.sort(actual, idItemComparator);
         Collections.sort(expected, idItemComparator);
 
         assertEquals(expected, actual);
-        assertDeepEquals(expected, actual);
+//        assertDeepEquals(expected, actual);
     }
     
-    //private void putItemInCloset(Item item, Closet closet);
+    @Test
+    public void putItemInCloset(){
+        
+        manager.putItemInCloset(i1, c1);
+        manager.putItemInCloset(i2, c1);
+        
+        assertTrue(manager.isItemInCloset(i1, c1));
+        assertTrue(manager.isItemInCloset(i2, c1));
+    }
     
-    //private void removeItemFromCloset(Item item, Closet closet);
+    /*
+    @Test
+    public void removeItemFromCloset(){
+        manager.putItemInCloset(i1, c1);
+        manager.putItemInCloset(i2, c1);
+        manager.putItemInCloset(i3, c1);
+        manager.putItemInCloset(i4, c2);
+        
+        manager.removeItemFromCloset(i1, c1);
+        manager.removeItemFromCloset(i2, c1);
+        manager.removeItemFromCloset(i3, c1);
+        
+        assertTrue(manager.getAllItemsFromCloset(c1).isEmpty());
+        manager.removeItemFromCloset(i4, c2);
+        assertTrue(manager.getAllItemsFromCloset(c2).isEmpty());
+    }
+    */
+    @Test
+    public void findClosetWithItem(){
+        manager.putItemInCloset(i1, c1);
+        manager.putItemInCloset(i2, c1);
+        manager.putItemInCloset(i3, c1);
+        manager.putItemInCloset(i4, c1);
+        
+        assertEquals(manager.findClosetWithItem(i1), c1);
+        assertEquals(manager.findClosetWithItem(i4), c1);
+        
+        
+        
+    }
     
-    //private Closet findClosetWithItem(Item item);
+    @Test(expected = IllegalArgumentException.class)
+    public void findClosetWithItemThatIsNull(){
+        manager.findClosetWithItem(null);
+    }
     
-    //private List<Item> findItemsInClosetByType(Closet closet, String type);
     
+    @Test
+    public void findItemsInClosetByType(){
+        manager.putItemInCloset(i1, c1);
+        manager.putItemInCloset(i2, c1);
+        manager.putItemInCloset(i3, c1);
+        manager.putItemInCloset(i4, c1);
+                
+        List<Item> expected = Arrays.asList(i1, i4);
+        List<Item> actual = manager.findItemsInClosetByType(c1, "shirt 1");
+        Collections.sort(actual, idItemComparator);
+        Collections.sort(expected, idItemComparator);
+
+        assertEquals(expected, actual);
+//        assertDeepEquals(expected, actual);
+    }
     
+    @Test
+    public void isItemInCloset(){
+        assertFalse(manager.isItemInCloset(i1, c1));
+        
+        manager.putItemInCloset(i1, c1);
+        
+        assertTrue(manager.isItemInCloset(i1, c1));
+
+    }
     
     
     private void assertDeepEquals(Closet expected, Closet actual) {
@@ -89,7 +202,7 @@ public class DressroomManagerImplTest {
     
     private void assertDeepEquals(Item expected, Item actual) {
         assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getCloset(), actual.getCloset());
+        //assertEquals(expected.getCloset(), actual.getCloset());
         assertEquals(expected.getGender(), actual.getGender());
         assertEquals(expected.getAdded(), actual.getAdded());
         assertEquals(expected.getNote(), actual.getNote());
@@ -113,7 +226,23 @@ public class DressroomManagerImplTest {
             return o1.getId().compareTo(o2.getId());
         }
     };
+
+    private static Closet newCloset(String owner, String name){
+        Closet closet = new Closet();
+        closet.setOwner(owner);
+        closet.setName(name);
+        return closet; 
+    }
     
+    private static Item newItem(String type, Gender gender, String size, String note, Closet closet){
+        Item item = new Item();
+        item.setType(type);
+        item.setGender(gender);
+        item.setSize(size);
+        item.setNote(note);
+        item.setCloset(closet);
+        return item; 
+    }
     
     
 }

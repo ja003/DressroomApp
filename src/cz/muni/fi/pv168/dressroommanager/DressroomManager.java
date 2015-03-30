@@ -19,9 +19,11 @@ public interface DressroomManager {
     
     public void putItemInCloset(Item item, Closet closet);
     
-    public void removeItemFromCloset(Item item, Closet closet);
+    //public void removeItemFromCloset(Item item, Closet closet);
     
     public Closet findClosetWithItem(Item item);
+    
+    public boolean isItemInCloset(Item item, Closet closet); 
     
     public List<Item> findItemsInClosetByType(Closet closet, String type);
     

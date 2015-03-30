@@ -5,6 +5,11 @@
  */
 package cz.muni.fi.pv168.dressroommanager;
 
+import cz.muni.fi.pv168.common.DBUtils;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,10 +20,26 @@ import org.junit.Test;
  */
 public class ItemsManagerImplTest {
     private ItemsManagerImpl manager;
+    private DataSource ds;
+    
+    private static DataSource prepareDataSource() throws SQLException {
+        BasicDataSource ds = new BasicDataSource();
+        //we will use in memory database
+        ds.setUrl("jdbc:derby:memory:closetmgr-test;create=true");
+        return ds;
+    }
     
     @Before
-    public void setUp() {
+    public void setUp() throws SQLException{
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds, ItemsManager.class.getResource("createTables.sql"));
         manager = new ItemsManagerImpl();
+        manager.setDataSource(ds);
+    }
+    
+    @After
+    public void tearDown() throws SQLException{
+        DBUtils.executeSqlScript(ds, ItemsManager.class.getResource("dropTables.sql"));
     }
     
     /**

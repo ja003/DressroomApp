@@ -6,18 +6,22 @@
 
 package cz.muni.fi.pv168.dressroommanager;
 
+import cz.muni.fi.pv168.common.IllegalEntityException;
+import cz.muni.fi.pv168.common.ServiceFailureException;
+import cz.muni.fi.pv168.common.ValidationException;
+
 /**
  *
- * @author Vukmir
+ * @author Anna
  */
 public interface ItemsManager{
     
-    public void createItem(Item item);
+    public void createItem(Item item) throws ServiceFailureException, ValidationException, IllegalEntityException;
     
-    public void deleteItem(Item item);
+    public void deleteItem(Item item)throws ServiceFailureException, IllegalEntityException;
     
-    public Item getItemById(Long id);
+    public Item getItemById(Long id)throws ServiceFailureException;
     
-    public void updateItem(Item item);
+    public void updateItem(Item item)throws ServiceFailureException, ValidationException, IllegalEntityException;
     
 }

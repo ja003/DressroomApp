@@ -25,7 +25,7 @@ public class ItemsManagerImplTest {
     private static DataSource prepareDataSource() throws SQLException {
         BasicDataSource ds = new BasicDataSource();
         //we will use in memory database
-        ds.setUrl("jdbc:derby:memory:closetmgr-test;create=true");
+        ds.setUrl("jdbc:derby:memory:dressroom-test;create=true");
         return ds;
     }
     
@@ -53,8 +53,9 @@ public class ItemsManagerImplTest {
         Item item = newItem("shirt", Gender.FEMALE, "XS", " ");
         manager.createItem(item);
         
+        Long itemId = item.getId();
         assertNotNull(item.getId());
-        Item result = manager.getItemById(item.getId());
+        Item result = manager.getItemById(itemId);
         assertEquals(item, result);
         assertNotSame(item, result);
     }
@@ -170,15 +171,24 @@ public class ItemsManagerImplTest {
      */
     @Test
     public void getItemById(){
+        assertNull(manager.getItemById(1l));
+        
+        Item item  = newItem("shirt", Gender.FEMALE, "XS", " ");
+        manager.createItem(item);
+        Long itemId = item.getId();
+
+        Item result = manager.getItemById(itemId);
+        assertEquals(item, result);
+        //assertItemDeepEquals(item, result);
+        /*
         System.out.println("test getItemById");
         
         Long id = null;
         ItemsManagerImpl instance = new ItemsManagerImpl();
         Item expResult = null;
         Item result = instance.getItemById(id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");   
+        assertEquals(expResult, result);  
+        */
     }
     
     /**

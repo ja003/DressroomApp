@@ -44,7 +44,7 @@ public class ClosetManagerImplTest {
     private static DataSource prepareDataSource() throws SQLException {
         BasicDataSource ds = new BasicDataSource();
         //we will use in memory database
-        ds.setUrl("jdbc:derby:memory:closetmgr-test;create=true");
+        ds.setUrl("jdbc:derby:memory:dressroom-test;create=true");
         return ds;
     }
 

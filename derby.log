@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-2015-03-26 22:51:11.522 GMT:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.2.1 - (999685): instance a816c00e-014c-5848-3c4b-000006c4a408 
-on database directory memory:C:\Users\Vukmir\Dropbox\ŠKOLA\PV168\DressRoomApp\closetmgr-test  with class loader sun.misc.Launcher$AppClassLoader@7960c21a 
+2015-03-30 14:17:42.058 GMT:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.2.1 - (999685): instance a816c00e-014c-6b0b-8f55-000006c3f660 
+on database directory memory:C:\Users\Vukmir\Dropbox\ŠKOLA\PV168\DressRoomApp\dressroom-test  with class loader sun.misc.Launcher$AppClassLoader@7960c21a 
 Loaded from file:/C:/Users/Vukmir/Dropbox/%c5%a0KOLA/PV168/DressRoomApp/lib/derby.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.7.0_67-b01

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+//jj
 /**
  *
  * @author Vukmir
@@ -36,7 +37,7 @@ public class ClosetManagerImpl implements ClosetManager
     private static final Logger logger = Logger.getLogger(
             ClosetManagerImpl.class.getName());
 
-    public ClosetManagerImpl( ) {}
+    public ClosetManagerImpl() {}
     
     public ClosetManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;

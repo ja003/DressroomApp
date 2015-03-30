@@ -69,17 +69,17 @@ public class ItemsManagerImpl implements ItemsManager{
             // method DBUtils.closeQuietly(...) 
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
-                    "INSERT INTO ITEM (type,date,gender,size,note,closet) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO ITEM (type,add_date,gender,size,note) "
+                    + "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 st.setString(1, item.getType());
                 st.setDate(2, item.getAdded());
                 st.setString(3, item.getGender().name());
                 st.setString(4, item.getSize());
                 st.setString(5, item.getNote());
-                st.setString(6, item.getCloset().getName());
+                //st.setLong(6, item.getCloset().getId());
             
             int count = st.executeUpdate();
-            DBUtils.chcekUpdatesCount(count, item, true);
+            DBUtils.checkUpdatesCount(count, item, true);
             
             Long id = DBUtils.getId(st.getGeneratedKeys());
             item.setId(id);
@@ -129,7 +129,7 @@ public class ItemsManagerImpl implements ItemsManager{
     }   
     
     @Override
-    public Item getItemById(Long id){
+    public Item getItemById(Long id) throws ServiceFailureException{
         
         checkDataSource();
         
@@ -141,9 +141,9 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try{
             conn = dataSource.getConnection();
-            st = conn.prepareStatement("SELECT id, type, date, gander, size, note, closet"
-                    + "FROM item WHERE ID = ?");
-                st.setLong(1, id);
+            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note"
+                    + " FROM item WHERE ID = ?");
+            st.setLong(1, id);
             return executeQueryForSingleItem(st);
         } catch (SQLException ex){
             String msg = "Error when getting item with id = " + id + " from DB";
@@ -212,7 +212,7 @@ public class ItemsManagerImpl implements ItemsManager{
         if (item.getType().length() < 1) {
             throw new ValidationException("type of item is empty");
         }
-        if (item.getCloset().getName().length() < 1) {
+        if (item.getType().length() < 1) {
             throw new ValidationException("item's closet name is empty");
         }
         /*
@@ -226,7 +226,7 @@ public class ItemsManagerImpl implements ItemsManager{
         Item item = new Item();
         item.setId(rs.getLong("id"));
         item.setType(rs.getString("type"));
-        item.setAdded(rs.getDate("added"));
+        item.setAdded(rs.getDate("ADD_DATE"));
         //item.setGender(rs.getString("gender"));
         item.setSize(rs.getString("size"));
         item.setNote(rs.getString("note"));

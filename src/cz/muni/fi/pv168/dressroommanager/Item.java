@@ -13,7 +13,7 @@ package cz.muni.fi.pv168.dressroommanager;
 public class Item  {
     private Long id;
     private String type;
-    private java.sql.Date added;
+    private java.sql.Date add_date;
     private Gender gender;
     private String size;
     private String note;
@@ -39,7 +39,7 @@ public class Item  {
     }
     
     public void setAdded(java.sql.Date added){
-        this.added = added;
+        this.add_date = added;
     }
     
     public void setGender(Gender gender) {
@@ -67,7 +67,7 @@ public class Item  {
     }
 
     public java.sql.Date getAdded() {
-        return added;
+        return add_date;
     }
 
     public Gender getGender() {
@@ -88,9 +88,9 @@ public class Item  {
     
     @Override
     public String toString() {
-        return "Item{id=" + id + ", type=" + type + ", added=" + added +
+        return "Item{id=" + id + ", type=" + type + ", added=" + add_date +
                 ", gender=" + gender + ", size=" + size + ", note=" +
-                note + ", closet=" + closet + '}';
+                note + '}';
     }
 
     @Override

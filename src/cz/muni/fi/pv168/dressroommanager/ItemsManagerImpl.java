@@ -11,14 +11,19 @@ import cz.muni.fi.pv168.common.IllegalEntityException;
 import cz.muni.fi.pv168.common.ServiceFailureException;
 import cz.muni.fi.pv168.common.ValidationException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import javax.sql.*;
 import javax.sql.DataSource;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,13 +39,18 @@ public class ItemsManagerImpl implements ItemsManager{
     private static final Logger logger = Logger.getLogger(
             ItemsManagerImpl.class.getName());
 
-    /*
-    public ItemsManagerImpl( ) {}
+    
+    private static ClosetManagerImpl closetManager;
+    
+    public ItemsManagerImpl( ) {
+        }
     
     public ItemsManagerImpl(DataSource dataSource) {
+        closetManager = new ClosetManagerImpl();
         this.dataSource = dataSource;
+        closetManager.setDataSource(dataSource);
     }
-    */
+    
     
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -57,6 +67,9 @@ public class ItemsManagerImpl implements ItemsManager{
     public void createItem(Item item){
         //logger.log(Level.INFO, "Attempt to add an item: {0}", item.toString());
         checkDataSource();
+        if(item != null) {
+            item.setAdded(new java.sql.Date((new java.util.Date()).getTime()));
+        }
         validate(item);
         if (item.getId() != null) {
             throw new IllegalEntityException("item id is already set");
@@ -69,14 +82,14 @@ public class ItemsManagerImpl implements ItemsManager{
             // method DBUtils.closeQuietly(...) 
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
-                    "INSERT INTO ITEM (type,add_date,gender,size,note) "
-                    + "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO ITEM (type,add_date,gender,size,note,closet) "
+                    + "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 st.setString(1, item.getType());
                 st.setDate(2, item.getAdded());
                 st.setString(3, item.getGender().name());
                 st.setString(4, item.getSize());
                 st.setString(5, item.getNote());
-                //st.setLong(6, item.getCloset().getId());
+                st.setLong(6, item.getCloset().getId());
             
             int count = st.executeUpdate();
             DBUtils.checkUpdatesCount(count, item, true);
@@ -141,7 +154,7 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try{
             conn = dataSource.getConnection();
-            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note"
+            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note, closet"
                     + " FROM item WHERE ID = ?");
             st.setLong(1, id);
             return executeQueryForSingleItem(st);
@@ -170,13 +183,13 @@ public class ItemsManagerImpl implements ItemsManager{
             // method DBUtils.closeQuietly(...) 
             conn.setAutoCommit(false);            
             st = conn.prepareStatement(
-                    "UPDATE Item SET type = ?, gender = ?, size = ?, note = ?, closet = ? WHERE id = ?");
+                    "UPDATE Item SET type = ?, gender = ?, size = ?, note = ? WHERE id = ?");
                 st.setString(1, item.getType());
                 st.setString(2, item.getGender().name());
                 st.setString(3, item.getSize());
                 st.setString(4, item.getNote());
-                st.setString(5, item.getCloset().getName());
-                st.setLong(6, item.getId());
+                //st.setLong(5, item.getCloset().getId());
+                st.setLong(5, item.getId());
 
             int count = st.executeUpdate();
             DBUtils.checkUpdatesCount(count, item, false);
@@ -205,21 +218,40 @@ public class ItemsManagerImpl implements ItemsManager{
         }
     }
     
+    //UPRAVIT!!!!
     static private void validate(Item item) {
         if (item == null) {
             throw new IllegalArgumentException("item is null");
         }
-        if (item.getType().length() < 1) {
-            throw new ValidationException("type of item is empty");
+        
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setLenient(false);
+        try {
+            df.parse(item.getAdded().toString());
+        } catch(Exception e) {
+            throw new ValidationException("date not in valid format");            
         }
-        if (item.getType().length() < 1) {
-            throw new ValidationException("item's closet name is empty");
+        if (item.getType() == null || item.getType().isEmpty()) {
+            throw new ValidationException("item type is empty");
         }
-        /*
-        if(closet.getOwner().matches(".*\\d.*")){
-            throw new ValidationException("owner contains number");
-        } 
+        
+        if (item.getGender() == null) {
+            throw new ValidationException("item gender is null");
+        }
+        
+        /* // not required, so no reason to validate
+        if (item.getNote().isEmpty()) {
+            throw new ValidationException("item note is empty");
+        }
+        
+        if (item.getSize().isEmpty()) {
+            throw new ValidationException("item note is empty");
+        }
         */
+        
+        // if (item.getCloset() == null) {
+        //    throw new ValidationException("item closet is empty");
+        // }
     }
     
     static private Item resultSetToItem(ResultSet rs) throws SQLException{
@@ -227,10 +259,11 @@ public class ItemsManagerImpl implements ItemsManager{
         item.setId(rs.getLong("id"));
         item.setType(rs.getString("type"));
         item.setAdded(rs.getDate("ADD_DATE"));
-        //item.setGender(rs.getString("gender"));
+        item.setGender(Gender.valueOf(rs.getString("gender")));
         item.setSize(rs.getString("size"));
         item.setNote(rs.getString("note"));
-        //item.setCloset(rs.getString("closet"));
+        //item.setCloset(closetManager.getClosetById(rs.getLong("closet")));
+       
         
         return item;
     }

@@ -194,16 +194,6 @@ public class ItemsManagerImplTest {
 
         Item result = manager.getItemById(itemId);
         assertEquals(item, result);
-        //assertItemDeepEquals(item, result);
-        /*
-        System.out.println("test getItemById");
-        
-        Long id = null;
-        ItemsManagerImpl instance = new ItemsManagerImpl();
-        Item expResult = null;
-        Item result = instance.getItemById(id);
-        assertEquals(expResult, result);  
-        */
     }
     
     /**
@@ -233,7 +223,6 @@ public class ItemsManagerImplTest {
         item.setGender(gender);
         item.setSize(size);
         item.setNote(note);
-        item.setCloset(closet);
         return item; 
     }
     

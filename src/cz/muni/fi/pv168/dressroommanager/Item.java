@@ -17,7 +17,7 @@ public class Item  {
     private Gender gender;
     private String size;
     private String note;
-    private Closet closet;
+    //private Closet closet;
 
     public Item(String type, Gender gender, String size, String note ) {
         this.type = type;
@@ -54,9 +54,6 @@ public class Item  {
         this.note = note;
     }
 
-    public void setCloset(Closet closet) {
-        this.closet = closet;
-    }
 
     public Long getId() {
         return id;
@@ -82,9 +79,6 @@ public class Item  {
         return note;
     }
 
-    public Closet getCloset() {
-        return closet;
-    }
     
     @Override
     public String toString() {

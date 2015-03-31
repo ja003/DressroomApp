@@ -82,14 +82,14 @@ public class ItemsManagerImpl implements ItemsManager{
             // method DBUtils.closeQuietly(...) 
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
-                    "INSERT INTO ITEM (type,add_date,gender,size,note,closet) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO ITEM (type,add_date,gender,size,note) "
+                    + "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 st.setString(1, item.getType());
                 st.setDate(2, item.getAdded());
                 st.setString(3, item.getGender().name());
                 st.setString(4, item.getSize());
                 st.setString(5, item.getNote());
-                st.setLong(6, item.getCloset().getId());
+                //st.setLong(6, item.getCloset().getId());
             
             int count = st.executeUpdate();
             DBUtils.checkUpdatesCount(count, item, true);
@@ -154,7 +154,7 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try{
             conn = dataSource.getConnection();
-            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note, closet"
+            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note, closetId"
                     + " FROM item WHERE ID = ?");
             st.setLong(1, id);
             return executeQueryForSingleItem(st);

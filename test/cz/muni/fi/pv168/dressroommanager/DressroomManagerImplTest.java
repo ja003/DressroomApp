@@ -52,17 +52,17 @@ public class DressroomManagerImplTest {
         c1 = newCloset("Anna", "Closet_01");
         c2 = newCloset("Adam", "Closet_02");
         c3 = newCloset("Tomas", "Closet_03");        
-        fakeCloset = newCloset("fake", "fake");
+        //fakeCloset = newCloset("fake", "fake");
         closetWithNoItem = newCloset("Petr", "Closet_05");
 
         closetWithNullId = newCloset("Pavel", "Closet_04");
         
-        i1 = newItem("shirt 1", Gender.BOTH, "M", null, fakeCloset);
-        i2 = newItem("shirt 2", Gender.FEMALE, null, "beautiful", fakeCloset);
-        i3 = newItem("shirt 3", Gender.MALE, "XXl", "with awesome unicorn", fakeCloset);
-        i4 = newItem("shirt 1", Gender.MALE, null, null, fakeCloset);
+        i1 = newItem("shirt 1", Gender.BOTH, "M", null);
+        i2 = newItem("shirt 2", Gender.FEMALE, null, "beautiful");
+        i3 = newItem("shirt 3", Gender.MALE, "XXl", "with awesome unicorn");
+        i4 = newItem("shirt 1", Gender.MALE, null, null);
         
-        closetManager.createCloset(fakeCloset);
+        //closetManager.createCloset(fakeCloset);
 
         
         itemsManager.createItem(i1);
@@ -76,14 +76,7 @@ public class DressroomManagerImplTest {
         closetManager.createCloset(closetWithNoItem);
         
         //a dalsi s nullId nebo notInDB
-        /*
-        graveWithNullId = newGrave(1,1,1,"Grave with null id");
-        graveNotInDB = newGrave(1,1,1,"Grave not in DB");
-        graveNotInDB.setId(g3.getId() + 100);
-        bodyWithNullId = newBody("Body with null id", null, null, true);
-        bodyNotInDB = newBody("Body not in DB", null, null, true);
-        bodyNotInDB.setId(b5.getId() + 100);
-        */
+        
     }
     
     @Before
@@ -130,7 +123,7 @@ public class DressroomManagerImplTest {
         assertTrue(manager.isItemInCloset(i2, c1));
     }
     
-    /*
+    
     @Test
     public void removeItemFromCloset(){
         manager.putItemInCloset(i1, c1);
@@ -146,7 +139,7 @@ public class DressroomManagerImplTest {
         manager.removeItemFromCloset(i4, c2);
         assertTrue(manager.getAllItemsFromCloset(c2).isEmpty());
     }
-    */
+    
     @Test
     public void findClosetWithItem(){
         manager.putItemInCloset(i1, c1);
@@ -234,13 +227,12 @@ public class DressroomManagerImplTest {
         return closet; 
     }
     
-    private static Item newItem(String type, Gender gender, String size, String note, Closet closet){
+    private static Item newItem(String type, Gender gender, String size, String note){
         Item item = new Item();
         item.setType(type);
         item.setGender(gender);
         item.setSize(size);
         item.setNote(note);
-        item.setCloset(closet);
         return item; 
     }
     

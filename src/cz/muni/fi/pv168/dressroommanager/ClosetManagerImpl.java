@@ -200,7 +200,7 @@ public class ClosetManagerImpl implements ClosetManager
             Closet result = rowToCloset(rs);                
             if (rs.next()) {
                 throw new ServiceFailureException(
-                        "Internal integrity error: more graves with the same id found!");
+                        "Internal integrity error: more closets with the same id found!");
             }
             return result;
         } else {
@@ -227,7 +227,7 @@ public class ClosetManagerImpl implements ClosetManager
     
     private static void validate(Closet closet) {
         if (closet == null) {
-            throw new IllegalArgumentException("closet is null");
+            throw new IllegalArgumentException("[v]closet is null");
         }
         if (closet.getOwner().length() < 1) {
             throw new ValidationException("owner name is empty");

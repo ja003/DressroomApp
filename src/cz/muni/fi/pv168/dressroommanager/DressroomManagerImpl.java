@@ -61,7 +61,7 @@ public class DressroomManagerImpl implements DressroomManager
             //checkIfGraveHasSpace(conn, closet);
             
             findSt = conn.prepareStatement(
-                    "SELECT * FROM Item WHERE closet = ?");
+                    "SELECT * FROM Item WHERE closetId = ?");
             findSt.setLong(1, closet.getId());
             return ItemsManagerImpl.executeQueryForMultipleItems(findSt);
         } catch (SQLException ex) {
@@ -99,7 +99,7 @@ public class DressroomManagerImpl implements DressroomManager
             //checkIfGraveHasSpace(conn, closet);
             
             updateSt = conn.prepareStatement(
-                    "UPDATE Item SET closet = ? WHERE id = ?");
+                    "UPDATE Item SET closetId = ? WHERE id = ? AND closetId IS NULL");
                 updateSt.setLong(1, closet.getId());
                 updateSt.setLong(2, item.getId());
             int count = updateSt.executeUpdate();
@@ -119,7 +119,7 @@ public class DressroomManagerImpl implements DressroomManager
         
     }
     
-    /*// we don't allow item to exists without closet, so this make no sense
+    // we don't allow item to exists without closet, so this make no sense
     public void removeItemFromCloset(Item item, Closet closet)throws ServiceFailureException, IllegalEntityException {
         checkDataSource();
         if (closet == null) {
@@ -143,7 +143,7 @@ public class DressroomManagerImpl implements DressroomManager
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "UPDATE Item SET closetId = NULL WHERE id = ? AND closetId = ?");
-                    //"UPDATE Body SET graveId = NULL WHERE id = ? AND graveId = ?");
+                    
             st.setLong(1, item.getId());
             st.setLong(2, closet.getId());
             int count = st.executeUpdate();
@@ -158,7 +158,7 @@ public class DressroomManagerImpl implements DressroomManager
             DBUtils.closeQuietly(conn, st);
         }   
     }
-    */
+    
     public Closet findClosetWithItem(Item item)throws ServiceFailureException, IllegalEntityException{
         checkDataSource();
         if(item == null){
@@ -172,7 +172,7 @@ public class DressroomManagerImpl implements DressroomManager
         try{
             conn = dataSource.getConnection();
             st = conn.prepareStatement("SELECT * "
-                    + " FROM Closet JOIN Item ON Closet.id = Item.closet"
+                    + " FROM Closet JOIN Item ON Closet.id = Item.closetId"
                     + " WHERE Item.id = ?");
                 st.setLong(1, item.getId());
                 return ClosetManagerImpl.executeQueryForSingleCloset(st);
@@ -211,7 +211,7 @@ public class DressroomManagerImpl implements DressroomManager
             //checkIfGraveHasSpace(conn, closet);
             
             findSt = conn.prepareStatement(
-                    "SELECT * FROM Item WHERE closet = ? AND id = ?");
+                    "SELECT * FROM Item WHERE closetId = ? AND id = ?");
             findSt.setLong(1, closet.getId());
             findSt.setLong(2, item.getId());
              
@@ -248,7 +248,7 @@ public class DressroomManagerImpl implements DressroomManager
             //checkIfGraveHasSpace(conn, closet);
             
             findSt = conn.prepareStatement(
-                    "SELECT * FROM Item WHERE closet = ? AND type = ?");
+                    "SELECT * FROM Item WHERE closetId = ? AND type = ?");
             findSt.setLong(1, closet.getId());
             findSt.setString(2, type);
              

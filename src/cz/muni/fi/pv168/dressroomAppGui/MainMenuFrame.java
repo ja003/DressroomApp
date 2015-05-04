@@ -36,17 +36,56 @@ public class MainMenuFrame extends javax.swing.JFrame {
     public MainMenuFrame() {
         initComponents();
         new AllItemsFromClosetSwingWorker().execute();
+        new AllClosetsSwingWorker().execute();
     }
     
     private static DataSource prepareDataSource() throws SQLException {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:derby:memory:dressroom-gui;create=true");
-        //dataSource.setUrl(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("url"));
-        //dataSource.setUsername(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("user"));
-        //dataSource.setPassword(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("password"));
+        //dataSource.setUrl("jdbc:derby:memory:dressroom-gui;create=true");
+        dataSource.setUrl(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("url"));
+        dataSource.setUsername(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("user"));
+        dataSource.setPassword(java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/settings").getString("password"));
         return dataSource;
     }
 
+    
+    
+    private class AllClosetsSwingWorker extends SwingWorker<List<Closet>, Void> {
+
+        private List<Closet> closets;
+
+        @Override
+        protected List<Closet> doInBackground() throws Exception {
+            dataSource = prepareDataSource();
+            closetManager = new ClosetManagerImpl();
+            closetManager.setDataSource(dataSource);
+            closets = new ArrayList<>();
+            try{
+                closets = closetManager.getAllClosets();
+            }catch(Exception e){
+                System.out.println("no closets available");
+                Closet closet = new Closet("XX","YY");
+                closets.add(closet);
+            }
+            return closets;
+        }
+
+        @Override
+        protected void done() {
+            List<Closet> closets = new ArrayList<Closet>();
+            try{
+                closets.addAll(closetManager.getAllClosets());
+            }catch(Exception e){
+                closets.add(new Closet("DD","FF"));
+                closets.add(new Closet("PP","LL"));
+            }
+            ClosetsComboBoxModel model = new ClosetsComboBoxModel(closets);
+            closetsComboBox.setModel(model);
+            //ClosetsComboBoxModel model = (ClosetsComboBoxModel) closetsComboBox.getModel();
+
+        }
+    }
+    
     
     
     private class AllItemsFromClosetSwingWorker extends SwingWorker<List<Item>, Void> {
@@ -59,7 +98,13 @@ public class MainMenuFrame extends javax.swing.JFrame {
             dressroomManager = new DressroomManagerImpl();
             dressroomManager.setDataSource(dataSource);
             items = new ArrayList<>();
-            items = dressroomManager.getAllItemsFromCloset(currentCloset);
+            try{
+                items = dressroomManager.getAllItemsFromCloset(currentCloset);
+            }catch(Exception e){
+                System.out.println("no closet selected");
+                items.add(new Item("xx",Gender.BOTH,"S","XX"));
+                items.add(new Item("jj",Gender.BOTH,"J","DD"));
+            }
             return items;
         }
 
@@ -102,7 +147,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        closetsComboBox = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
@@ -122,11 +167,10 @@ public class MainMenuFrame extends javax.swing.JFrame {
         jLabel1.setText("Dressroom");
         jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Adam Jurík", "Bla Blah", "Klu Klang" }));
-        jComboBox1.setName(""); // NOI18N
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        closetsComboBox.setName(""); // NOI18N
+        closetsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                closetsComboBoxActionPerformed(evt);
             }
         });
 
@@ -191,18 +235,18 @@ public class MainMenuFrame extends javax.swing.JFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3)
+                        .addGap(37, 37, 37)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel3)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -221,7 +265,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -243,9 +287,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void closetsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closetsComboBoxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_closetsComboBoxActionPerformed
 
     private void newClosetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newClosetButtonActionPerformed
         new NewClosetFrame().setVisible(true);
@@ -307,6 +351,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox closetsComboBox;
     private javax.swing.JTable itemsTable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -314,7 +359,6 @@ public class MainMenuFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

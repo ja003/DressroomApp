@@ -15,6 +15,14 @@ public class Closet {
     private String owner;
     private String name;
     
+    public Closet(){}
+            
+    public Closet(String name, String owner){
+        this.name = name;
+        this.owner = owner;
+    }
+            
+    
     public Long getId() {
         return id;
     }

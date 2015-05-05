@@ -99,7 +99,6 @@ public class ClosetManagerImpl implements ClosetManager
         if (closet.getId() == null) {
             throw new IllegalArgumentException("Id is null");
         }
-        //log.info("Attempt to remove airship: "+closet.toString());
         
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement st = connection.prepareStatement("DELETE FROM closet WHERE id = ?")) {

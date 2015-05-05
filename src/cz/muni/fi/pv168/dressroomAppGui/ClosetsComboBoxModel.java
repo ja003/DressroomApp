@@ -15,6 +15,7 @@ import javax.swing.ComboBoxModel;
  */
 public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxModel{
     private String selectedClosetString;
+    private Closet selectedCloset;
     private List<Closet> closets;
     
     public ClosetsComboBoxModel(List closets){
@@ -22,8 +23,9 @@ public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxM
     }
     
     @Override
-    public String getSelectedItem(){
-        return selectedClosetString;
+    public Closet getSelectedItem(){
+        return selectedCloset;
+        //return selectedClosetString;
     }
     
     ////////////////////////////////////*********************OPRAVIT*********************//////////////////////////////////////
@@ -32,7 +34,8 @@ public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxM
             for (Closet c: closets){
                 //if (newValue.equals(c)){
                 if (newValue.equals(c) || newValue.toString().equals(c.getOwner())){
-                    selectedClosetString = c.getOwner();
+                    //selectedClosetString = c.getOwner();
+                    selectedCloset = c;
                     break;
                 }
             }
@@ -45,8 +48,21 @@ public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxM
       }
 
     @Override
-    public String getElementAt(int i) {
-      return closets.get(i).getOwner();
+    public Closet getElementAt(int i) {
+      return closets.get(i);
+    }
+    
+    public void addCloset(Closet closet) {
+        closets.add(closet);
+    }
+    
+    
+    public void removeCloset(Closet closet) {
+        closets.remove(closet);
+    }
+    
+    public void removeAllCloset(){
+         closets.clear();
     }
     
     

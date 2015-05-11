@@ -8,6 +8,7 @@ import cz.muni.fi.pv168.dressroommanager.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
 public class ItemsTableModel extends AbstractTableModel {
@@ -116,27 +117,25 @@ public class ItemsTableModel extends AbstractTableModel {
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 
+    Locale local = Locale.getDefault();
+    
+    String localeDirectory = "cz.muni.fi.pv168.dressroomAppGui.localization_" + local;
+    
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return "id";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("id");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnId");
             case 1:
-                return "type";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("type");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnType");
             case 2:
-                return "added";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("added");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnAdded");
             case 3:
-                return "gender";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("gender");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnGender");
             case 4:
-                return "size";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("size");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnSize");
             case 5:
-                return "note";
-                //return java.util.ResourceBundle.getBundle("cz.muni.fi.pv168.dressroomappgui/localization").getString("note");
+                return java.util.ResourceBundle.getBundle(localeDirectory).getString("columnNote");
             default:
                 throw new IllegalArgumentException("columnIndex");
         }

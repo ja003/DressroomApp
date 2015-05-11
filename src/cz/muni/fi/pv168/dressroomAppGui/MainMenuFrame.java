@@ -48,6 +48,10 @@ public class MainMenuFrame extends javax.swing.JFrame {
     public MainMenuFrame() {
         initComponents();
         
+        
+        //not working
+        chooseClosetLabel.setBackground(Color.red);
+        
         new AllClosetsSwingWorker().execute();
         new AllItemsFromClosetSwingWorker().execute();
         
@@ -57,9 +61,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         
     }
     
-    Locale local = Locale.getDefault();
-    private String localeDirectory = "cz.muni.fi.pv168.dressroomAppGui.localization_" + local;
+    private Locale local = Locale.getDefault();
     
+    private String localeDirectory = "cz.muni.fi.pv168.dressroomAppGui.localization_" + local;
     
     ResourceBundle bundle = ResourceBundle.getBundle(localeDirectory,local);
     
@@ -170,6 +174,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
             ClosetsComboBoxModel model = new ClosetsComboBoxModel(closetManager.getAllClosets());
             model.removeCloset(deletedCloset);
             System.out.println("deleted: " + deletedCloset);
+            if(model.getElementAt(0) != null)
+                model.setSelectedItem(model.getElementAt(0));
             closetsComboBox.setModel(model);
         }
     }
@@ -268,10 +274,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
             {
                 System.out.println("no closet selected");
                 model.setSelectedItem(model.getElementAt(0));
+                currentCloset = model.getElementAt(0);
                 System.out.println("selecting closet: " + model.getElementAt(0));
-                refreshButton.doClick();
+                
             }
             
+            refreshButton.doClick();
             
             //refresh on each action
             closetsComboBox.addActionListener(new ActionListener() {
@@ -374,8 +382,10 @@ public class MainMenuFrame extends javax.swing.JFrame {
         deleteClosetButton = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         itemsTable = new javax.swing.JTable();
-        jLabel3 = new javax.swing.JLabel();
+        chooseClosetLabel = new javax.swing.JLabel();
         refreshButton = new javax.swing.JButton();
+
+        newUpdateClosetFrame.setPreferredSize(new java.awt.Dimension(410, 270));
 
         closetOwnerTextField.setText("jTextField1");
         closetOwnerTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -384,11 +394,14 @@ public class MainMenuFrame extends javax.swing.JFrame {
             }
         });
 
+        newUpdateClosetLabel.setBackground(new java.awt.Color(255, 0, 102));
+        newUpdateClosetLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        newUpdateClosetLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         newUpdateClosetLabel.setText("New Closet");
 
-        closetOwnerLabel.setText("closet owner");
+        closetOwnerLabel.setText(bundle.getString("closetOwnerLabel"));
 
-        closetNameLabel.setText("closet name");
+        closetNameLabel.setText(bundle.getString("closetNameLabel"));
 
         closetNameTextField.setText("jTextField1");
         closetNameTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -428,32 +441,36 @@ public class MainMenuFrame extends javax.swing.JFrame {
             .addGroup(newUpdateClosetFrameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(newUpdateClosetLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(newUpdateClosetFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(closetOwnerTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
-                    .addComponent(closetOwnerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(closetOwnerTextField)
+                    .addComponent(closetOwnerLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(newUpdateClosetFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(closetNameTextField)
                     .addComponent(closetNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(addUpdateClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
+        newUpdateItemFrame.setPreferredSize(new java.awt.Dimension(400, 400));
+
+        newUpdateItemLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        newUpdateItemLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         newUpdateItemLabel.setText("New Item");
 
-        itemTypeLabel.setText("type");
+        itemTypeLabel.setText(bundle.getString("itemTypeLabel"));
 
         itemTypeTextField.setText("jTextField3");
 
-        jLabel9.setText("gender");
+        jLabel9.setText(bundle.getString("itemGenderLabel"));
 
-        jLabel10.setText("size");
+        jLabel10.setText(bundle.getString("itemSizeLabel"));
 
         itemSizeTextField.setText("jTextField3");
 
-        jLabel11.setText("note");
+        jLabel11.setText(bundle.getString("itemNoteLabel"));
 
         itemNoteTextField.setText("jTextField3");
 
@@ -520,11 +537,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new java.awt.Color(255, 255, 255));
+        setBackground(new java.awt.Color(153, 255, 102));
         setResizable(false);
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Dressroom");
+        jLabel1.setText(bundle.getString("dressroomLabel"));
         jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         closetsComboBox.setName(""); // NOI18N
@@ -542,24 +560,24 @@ public class MainMenuFrame extends javax.swing.JFrame {
         });
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Closet content");
+        jLabel2.setText(bundle.getString("closetContentLabel"));
         jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        newItemButton.setText("New Item");
+        newItemButton.setText(bundle.getString("newItemBtn"));
         newItemButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newItemButtonActionPerformed(evt);
             }
         });
 
-        updateItemButton.setText("Update Item");
+        updateItemButton.setText(bundle.getString("updateItemBtn"));
         updateItemButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateItemButtonActionPerformed(evt);
             }
         });
 
-        deleteItemButton.setText("Delete Item");
+        deleteItemButton.setText(bundle.getString("deleteItemBtn"));
         deleteItemButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteItemButtonActionPerformed(evt);
@@ -583,7 +601,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
         itemsTable.setModel(new ItemsTableModel());
         jScrollPane4.setViewportView(itemsTable);
 
-        jLabel3.setText(bundle.getString("chooseClosetLabel"));
+        chooseClosetLabel.setFont(new java.awt.Font("Tahoma", 2, 14)); // NOI18N
+        chooseClosetLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        chooseClosetLabel.setText(bundle.getString("chooseClosetLabel"));
+        chooseClosetLabel.setAlignmentY(0.0F);
+        chooseClosetLabel.setBorder(javax.swing.BorderFactory.createCompoundBorder());
+        chooseClosetLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         refreshButton.setText(bundle.getString("refreshBtn"));
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
@@ -599,29 +622,30 @@ public class MainMenuFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(newItemButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(updateItemButton)
-                        .addGap(37, 37, 37)
-                        .addComponent(deleteItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(deleteItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(newClosetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(updateClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(deleteClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(150, 150, 150)
-                                .addComponent(refreshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(updateClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(deleteClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(closetsComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(chooseClosetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(newClosetBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(refreshButton)))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -629,11 +653,11 @@ public class MainMenuFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(refreshButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(refreshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chooseClosetLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -644,8 +668,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
                     .addComponent(deleteClosetButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -665,7 +689,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
 	
 	
     private void newClosetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newClosetButtonActionPerformed
-        newUpdateClosetFrame.setSize(400, 400);
+        newUpdateClosetFrame.setSize(newUpdateClosetFrame.getPreferredSize());
         newUpdateClosetFrame.setLocationRelativeTo(null);
         updateC = false;
         newUpdateClosetLabel.setText("New Closet");
@@ -677,7 +701,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_newClosetButtonActionPerformed
 
     private void newItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newItemButtonActionPerformed
-        newUpdateItemFrame.setSize(400, 400);
+        newUpdateItemFrame.setSize(newUpdateItemFrame.getPreferredSize());
         newUpdateItemFrame.setLocationRelativeTo(null);
         updateI = false;
         newUpdateItemLabel.setText("New Item");
@@ -735,30 +759,48 @@ public class MainMenuFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteClosetActionPerformed
 
     private void updateItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateItemButtonActionPerformed
-        
+      
         int selectedRow = itemsTable.getSelectedRow();
-        newUpdateItemFrame.setSize(400, 400);
-        newUpdateItemFrame.setLocationRelativeTo(null);
-        updateI = true;
-        newUpdateItemLabel.setText("Update Item");
-        addUpdateItemButton.setText("UPDATE ITEM");
+        if (selectedRow == -1) {
+            String err = bundle.getBundle(localeDirectory).getString("noSelectedItem");
+            JOptionPane.showMessageDialog(this, err);
+        } else {
+            newUpdateItemFrame.setSize(newUpdateItemFrame.getPreferredSize());
+            newUpdateItemFrame.setLocationRelativeTo(null);
+            updateI = true;
+            newUpdateItemLabel.setText("Update Item");
+            addUpdateItemButton.setText("UPDATE ITEM");
 
-        itemsManager = new ItemsManagerImpl();
-        Object idValue = itemsTable.getValueAt(selectedRow, 0);
-        Item item = null;
-        try{
-        dataSource = prepareDataSource();
-        }catch(Exception e){
+            itemsManager = new ItemsManagerImpl();
+            Object idValue = itemsTable.getValueAt(selectedRow, 0);
+            Item item = null;
+            try{
+                dataSource = prepareDataSource();
+            }catch(Exception e){
+            }
+            itemsManager.setDataSource(dataSource);
+
+            try{
+                item = itemsManager.getItemById((Long) idValue);
+            }catch(Exception ex){
+                Logger.getLogger(MainMenuFrame.class.getName()).log(Level.SEVERE, null, ex);
+                throw ex;
+            }
+
+            updateId = item.getId();
+            
+            genderComboBox.removeAllItems();
+            for(Gender g: Gender.values()){
+                genderComboBox.addItem(g);
+            }
+        
+        
+            itemTypeTextField.setText(item.getType());
+            itemSizeTextField.setText(item.getSize());
+            itemNoteTextField.setText(item.getNote());
+            newUpdateItemFrame.setVisible(true);
+
         }
-        itemsManager.setDataSource(dataSource);
-        
-        item = itemsManager.getItemById((Long) idValue);
-        
-        updateId = item.getId();
-        itemTypeTextField.setText(item.getType());
-        itemSizeTextField.setText(item.getSize());
-        itemNoteTextField.setText(item.getNote());
-        newUpdateItemFrame.setVisible(true);
         
         
     }//GEN-LAST:event_updateItemButtonActionPerformed
@@ -790,7 +832,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
             
             boolean remove = false;
             String removeItemMsg = bundle.getBundle(localeDirectory).getString("removeItemMsg");
-            String title = java.util.ResourceBundle.getBundle(localeDirectory).getString("removeItemTitle");
+            String title = bundle.getBundle(localeDirectory).getString("removeItemTitle");
             int popUp = JOptionPane.showConfirmDialog(this, removeItemMsg, title,
                         JOptionPane.YES_NO_OPTION);
 
@@ -823,7 +865,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, err);
         }
         else{ 
-            newUpdateClosetFrame.setSize(400, 400);
+            newUpdateClosetFrame.setSize(newUpdateClosetFrame.getPreferredSize());
             newUpdateClosetFrame.setLocationRelativeTo(null);
 
             updateC = true;
@@ -933,7 +975,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
             refreshButton.doClick();
         }else{
             if(!typeOk){
-                String typeMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongTypeMsg");
+                String typeMsg = bundle.getBundle(localeDirectory).getString("wrongTypeMsg");
                 JOptionPane.showMessageDialog(this, typeMsg);
                 itemTypeTextField.setBackground(Color.PINK);
             }
@@ -941,7 +983,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                 itemTypeTextField.setBackground(Color.WHITE);
             }
             if(!sizeOk){
-                String sizeMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongSizeMsg");
+                String sizeMsg = bundle.getBundle(localeDirectory).getString("wrongSizeMsg");
                 JOptionPane.showMessageDialog(this, sizeMsg);
                 itemSizeTextField.setBackground(Color.PINK);
             }
@@ -1004,6 +1046,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addUpdateClosetButton;
     private javax.swing.JButton addUpdateItemButton;
+    private javax.swing.JLabel chooseClosetLabel;
     private javax.swing.JLabel closetNameLabel;
     private javax.swing.JTextField closetNameTextField;
     private javax.swing.JLabel closetOwnerLabel;
@@ -1021,7 +1064,6 @@ public class MainMenuFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JButton newClosetBtn;

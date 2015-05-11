@@ -142,6 +142,26 @@ public class ItemsManagerImpl implements ItemsManager{
     }   
     
     @Override
+    public List<Item> getAllItems() {
+
+        checkDataSource();
+
+        Connection conn = null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement("SELECT id, type, ADD_DATE, gender, size, note FROM item");
+            return executeQueryForMultipleItems(st);
+        } catch (SQLException ex) {
+            String msg = "Error when getting all items from DB!" + ex.getMessage();
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
+        }
+    }
+    
+    @Override
     public Item getItemById(Long id) throws ServiceFailureException{
         
         checkDataSource();

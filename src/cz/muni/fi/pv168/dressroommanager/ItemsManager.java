@@ -9,6 +9,7 @@ package cz.muni.fi.pv168.dressroommanager;
 import cz.muni.fi.pv168.common.IllegalEntityException;
 import cz.muni.fi.pv168.common.ServiceFailureException;
 import cz.muni.fi.pv168.common.ValidationException;
+import java.util.List;
 
 /**
  *
@@ -23,5 +24,7 @@ public interface ItemsManager{
     public Item getItemById(Long id)throws ServiceFailureException;
     
     public void updateItem(Item item)throws ServiceFailureException, ValidationException, IllegalEntityException;
+    
+    public List<Item> getAllItems() throws ServiceFailureException;
     
 }

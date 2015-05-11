@@ -42,6 +42,8 @@ public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxM
       }
     
     
+    
+    
     @Override
       public int getSize() {
         return closets.size();

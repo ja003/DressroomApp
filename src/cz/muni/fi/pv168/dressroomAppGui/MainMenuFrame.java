@@ -8,12 +8,17 @@ package cz.muni.fi.pv168.dressroomAppGui;
 
 import cz.muni.fi.pv168.common.ServiceFailureException;
 import cz.muni.fi.pv168.dressroommanager.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +26,7 @@ import javax.sql.DataSource;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.commons.dbcp.BasicDataSource;
+//import org. ;
 
 /**
  *
@@ -46,9 +52,16 @@ public class MainMenuFrame extends javax.swing.JFrame {
         new AllItemsFromClosetSwingWorker().execute();
         
         
-        refreshButton.doClick();
-        System.out.println("RERESH");
+        
+        System.out.println("language = " + local);
+        
     }
+    
+    Locale local = Locale.getDefault();
+    private String localeDirectory = "cz.muni.fi.pv168.dressroomAppGui.localization_" + local;
+    
+    
+    ResourceBundle bundle = ResourceBundle.getBundle(localeDirectory,local);
     
     public static DataSource prepareDataSource() throws SQLException {
         BasicDataSource dataSource = new BasicDataSource();
@@ -87,8 +100,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
             this.size = size;
         }
         
-        public void setGender(String gender) {
-            this.size = gender;
+        public void setGender(Gender gender) {
+            this.gender = gender;
         }
         
         public void setNote(String note) {
@@ -111,7 +124,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
             itemsManager.setDataSource(dataSource);
             dressroomManager = new DressroomManagerImpl();
             dressroomManager.setDataSource(dataSource);
-            gender = Gender.BOTH;                   ///////////*******************FIX
+            //gender = Gender.BOTH;                   ///////////*******************FIX
             item = new Item(type, gender, size, note);
             
             if(!updateI)
@@ -206,8 +219,10 @@ public class MainMenuFrame extends javax.swing.JFrame {
                 Logger.getLogger(MainMenuFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            
+            currentCloset = closet;
             closetsComboBox.setModel(model);
+            
+            new AllClosetsSwingWorker().execute();
         }
     }
     ///////////////////////////////////**************AllClosetsSwingWorker*******************///////////////////////////////////
@@ -244,8 +259,27 @@ public class MainMenuFrame extends javax.swing.JFrame {
             //set default Closet selection
             ClosetsComboBoxModel model = new ClosetsComboBoxModel(closets);
             closetsComboBox.setModel(model);
-            if(model.getSelectedItem() == null && model.getElementAt(0) != null)
+            
+            System.out.println("current! = " + currentCloset);   
+            if(currentCloset != null){
+                model.setSelectedItem(currentCloset);
+                System.out.println("selecting current closet: " + currentCloset);
+            }else if (model.getSelectedItem() == null && model.getElementAt(0) != null)
+            {
+                System.out.println("no closet selected");
                 model.setSelectedItem(model.getElementAt(0));
+                System.out.println("selecting closet: " + model.getElementAt(0));
+                refreshButton.doClick();
+            }
+            
+            
+            //refresh on each action
+            closetsComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    refreshButton.doClick();
+                }
+            });
             //ClosetsComboBoxModel model = (ClosetsComboBoxModel) closetsComboBox.getModel();
 
         }
@@ -294,6 +328,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                 Logger.getLogger(MainMenuFrame.class.getName()).log(Level.SEVERE, "null!!", ex);
             }
             
+            
         }
     }
     
@@ -322,15 +357,15 @@ public class MainMenuFrame extends javax.swing.JFrame {
         itemTypeLabel = new javax.swing.JLabel();
         itemTypeTextField = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        itemGenderTextField = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         itemSizeTextField = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         itemNoteTextField = new javax.swing.JTextField();
         addUpdateItemButton = new javax.swing.JButton();
+        genderComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         closetsComboBox = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
+        newClosetBtn = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         newItemButton = new javax.swing.JButton();
         updateItemButton = new javax.swing.JButton();
@@ -414,8 +449,6 @@ public class MainMenuFrame extends javax.swing.JFrame {
 
         jLabel9.setText("gender");
 
-        itemGenderTextField.setText("jTextField3");
-
         jLabel10.setText("size");
 
         itemSizeTextField.setText("jTextField3");
@@ -431,6 +464,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
             }
         });
 
+        genderComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {}));
+
         javax.swing.GroupLayout newUpdateItemFrameLayout = new javax.swing.GroupLayout(newUpdateItemFrame.getContentPane());
         newUpdateItemFrame.getContentPane().setLayout(newUpdateItemFrameLayout);
         newUpdateItemFrameLayout.setHorizontalGroup(
@@ -438,12 +473,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
             .addGroup(newUpdateItemFrameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(newUpdateItemFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(newUpdateItemLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(addUpdateItemButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(newUpdateItemFrameLayout.createSequentialGroup()
                         .addComponent(itemTypeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(itemTypeTextField))
-                    .addComponent(newUpdateItemLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, newUpdateItemFrameLayout.createSequentialGroup()
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -455,7 +490,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, newUpdateItemFrameLayout.createSequentialGroup()
                         .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(itemGenderTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)))
+                        .addComponent(genderComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         newUpdateItemFrameLayout.setVerticalGroup(
@@ -469,8 +504,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
                     .addComponent(itemTypeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(newUpdateItemFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(itemGenderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                    .addComponent(genderComboBox))
                 .addGap(18, 18, 18)
                 .addGroup(newUpdateItemFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -499,8 +534,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("New Closet");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        newClosetBtn.setText(bundle.getString("newClosetBtn"));
+        newClosetBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newClosetButtonActionPerformed(evt);
             }
@@ -531,14 +566,14 @@ public class MainMenuFrame extends javax.swing.JFrame {
             }
         });
 
-        updateClosetButton.setText("Update Closet");
+        updateClosetButton.setText(bundle.getString("updateClosetBtn"));
         updateClosetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateClosetActionPerformed(evt);
             }
         });
 
-        deleteClosetButton.setText("Delete Closet");
+        deleteClosetButton.setText(bundle.getString("deleteClosetBtn"));
         deleteClosetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteClosetActionPerformed(evt);
@@ -548,9 +583,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         itemsTable.setModel(new ItemsTableModel());
         jScrollPane4.setViewportView(itemsTable);
 
-        jLabel3.setText("Choose your Closet:");
+        jLabel3.setText(bundle.getString("chooseClosetLabel"));
 
-        refreshButton.setText("REFRESH");
+        refreshButton.setText(bundle.getString("refreshBtn"));
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 refreshButtonActionPerformed(evt);
@@ -578,7 +613,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(newClosetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(updateClosetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -602,7 +637,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(closetsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(newClosetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(updateClosetButton)
@@ -627,6 +662,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_closetsComboBoxActionPerformed
 
+	
+	
     private void newClosetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newClosetButtonActionPerformed
         newUpdateClosetFrame.setSize(400, 400);
         newUpdateClosetFrame.setLocationRelativeTo(null);
@@ -647,19 +684,54 @@ public class MainMenuFrame extends javax.swing.JFrame {
         addUpdateItemButton.setText("ADD ITEM");
         
         itemNoteTextField.setText("");
-        itemGenderTextField.setText("");
         itemTypeTextField.setText("");
         itemSizeTextField.setText("");
+        
+        genderComboBox.removeAllItems();
+        for(Gender g: Gender.values()){
+            genderComboBox.addItem(g);
+        }
         
         newUpdateItemFrame.setVisible(true);
     }//GEN-LAST:event_newItemButtonActionPerformed
 
     private void deleteClosetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteClosetActionPerformed
-       
-       deleteClosetSwingWorker = new DeleteClosetSwingWorker();
-       deleteClosetSwingWorker.execute();
-       
-       new AllClosetsSwingWorker().execute();
+       Closet closet = null;
+        closet = (Closet)closetsComboBox.getSelectedItem();
+        if(closet == null){
+            String err = bundle.getBundle(localeDirectory).getString("noSelectedCloset");
+            JOptionPane.showMessageDialog(this, err);
+        }
+        else{ 
+            boolean remove = false;
+            String removeClosetMsg = bundle.getBundle(localeDirectory).getString("removeClosetMsg");
+            String title = java.util.ResourceBundle.getBundle(localeDirectory).getString("removeClosetTitle");
+            int popUp = JOptionPane.showConfirmDialog(this, removeClosetMsg, title,
+                        JOptionPane.YES_NO_OPTION);
+            
+            remove = true;
+            for (Closet c : closetManager.getAllClosets()) {
+                if (c.equals(closet)) {
+                    remove = false;
+                    break;
+                }
+            }
+            
+            if (!remove) {
+                if (popUp == JOptionPane.YES_OPTION) {
+                    deleteClosetSwingWorker = new DeleteClosetSwingWorker();
+                    deleteClosetSwingWorker.execute();
+                    currentCloset = null;
+                    new AllClosetsSwingWorker().execute();
+                }
+            } else {
+                String removingItemMsg = bundle.getBundle(localeDirectory).getString("removingClosetMsg");
+                JOptionPane.showMessageDialog(this, removingItemMsg);
+            }
+            
+            
+            
+        }
     }//GEN-LAST:event_deleteClosetActionPerformed
 
     private void updateItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateItemButtonActionPerformed
@@ -685,7 +757,6 @@ public class MainMenuFrame extends javax.swing.JFrame {
         updateId = item.getId();
         itemTypeTextField.setText(item.getType());
         itemSizeTextField.setText(item.getSize());
-        itemGenderTextField.setText(item.getGender().toString());
         itemNoteTextField.setText(item.getNote());
         newUpdateItemFrame.setVisible(true);
         
@@ -694,72 +765,81 @@ public class MainMenuFrame extends javax.swing.JFrame {
 
     private void deleteItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteItemButtonActionPerformed
         int selectedRow = itemsTable.getSelectedRow();
-        try{
-             dataSource = prepareDataSource();
-        } catch(Exception e)
-        {
-            System.out.println("no datasource set");
-        }
-        itemsManager = new ItemsManagerImpl();
-        itemsManager.setDataSource(dataSource);
-        Object idValue = itemsTable.getValueAt(selectedRow, 0);
-        Item item = null;
-        
-        System.out.println();
-        try {
-            item = itemsManager.getItemById((Long) idValue);
-        } catch (Exception ex) {
-            Logger.getLogger(MainMenuFrame.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-        //Item item = itemsManager.getItemById((Long) idValue);
-        boolean remove = false;
         if (selectedRow == -1) {
-            return;
-        }
-        remove = true;
-        for (Item i : dressroomManager.getAllItemsFromCloset(currentCloset)) {
-            if (i.equals(item)) {
-                remove = false;
-                break;
+            String err = bundle.getBundle(localeDirectory).getString("noSelectedItem");
+            JOptionPane.showMessageDialog(this, err);
+        } else {
+            try{
+                 dataSource = prepareDataSource();
+            } catch(Exception e)
+            {
+                System.out.println("no datasource set");
             }
+            itemsManager = new ItemsManagerImpl();
+            itemsManager.setDataSource(dataSource);
+            Object idValue = itemsTable.getValueAt(selectedRow, 0);
+            Item item = null;
+
+            System.out.println();
+            try {
+                item = itemsManager.getItemById((Long) idValue);
+            } catch (Exception ex) {
+                Logger.getLogger(MainMenuFrame.class.getName()).log(Level.SEVERE, null, ex);
+                throw ex;
+            }
+            
+            boolean remove = false;
+            String removeItemMsg = bundle.getBundle(localeDirectory).getString("removeItemMsg");
+            String title = java.util.ResourceBundle.getBundle(localeDirectory).getString("removeItemTitle");
+            int popUp = JOptionPane.showConfirmDialog(this, removeItemMsg, title,
+                        JOptionPane.YES_NO_OPTION);
+
+            remove = true;
+            for (Item i : dressroomManager.getAllItemsFromCloset(currentCloset)) {
+                if (i.equals(item)) {
+                    remove = false;
+                    break;
+                }
+            }
+            if (!remove) {
+                if (popUp == JOptionPane.YES_OPTION) {
+                    dressroomManager.removeItemFromCloset(item, currentCloset);
+                }
+            } else {
+                String removingItemMsg = bundle.getBundle(localeDirectory).getString("removingItemMsg");
+                JOptionPane.showMessageDialog(this, removingItemMsg);
+            }
+            
+            new AllItemsFromClosetSwingWorker().execute();
         }
-        dressroomManager.removeItemFromCloset(item, currentCloset);
-        
-        
-        new AllItemsFromClosetSwingWorker().execute();
         
     }//GEN-LAST:event_deleteItemButtonActionPerformed
 
     private void updateClosetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateClosetActionPerformed
-        
-        newUpdateClosetFrame.setSize(400, 400);
-        newUpdateClosetFrame.setLocationRelativeTo(null);
-
-        updateC = true;
-        newUpdateClosetLabel.setText("Update closet");
-        
         Closet closet = null;
-        //try {
         closet = (Closet)closetsComboBox.getSelectedItem();
-        updateId = closet.getId();
-        
-        
-        closetNameTextField.setText(closet.getName());
-        closetOwnerTextField.setText(closet.getOwner());
-        newUpdateClosetFrame.setVisible(true);
-        
-        /*updateClosetFrame.setSize(400, 400);
-        updateClosetFrame.setLocationRelativeTo(null);
+        if(closet == null){
+            String err = bundle.getBundle(localeDirectory).getString("noSelectedCloset");
+            JOptionPane.showMessageDialog(this, err);
+        }
+        else{ 
+            newUpdateClosetFrame.setSize(400, 400);
+            newUpdateClosetFrame.setLocationRelativeTo(null);
 
-        Closet closet = null;
-        //try {
-        closet = (Closet)closetsComboBox.getSelectedItem();
-        updateId = closet.getId();
-        
-        updateClosetNameTextField.setText(closet.getName());
-        updateClosetOwnerTextField.setText(closet.getOwner());
-        updateClosetFrame.setVisible(true);*/
+            updateC = true;
+            String updateClosetLabel = bundle.getBundle(localeDirectory).getString("updateClosetLabel");
+            newUpdateClosetLabel.setText(updateClosetLabel);
+            String updateClosetBtn = bundle.getBundle(localeDirectory).getString("updateClosetBtn");
+            addUpdateClosetButton.setText(updateClosetBtn);
+
+
+            updateId = closet.getId();
+
+
+            closetNameTextField.setText(closet.getName());
+            closetOwnerTextField.setText(closet.getOwner());
+            newUpdateClosetFrame.setVisible(true);
+        }
     }//GEN-LAST:event_updateClosetActionPerformed
 
     private void closetOwnerTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closetOwnerTextFieldActionPerformed
@@ -771,17 +851,46 @@ public class MainMenuFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_closetNameTextFieldActionPerformed
 
     private void addUpdateClosetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUpdateClosetButtonActionPerformed
+        boolean nameOk = false;
+        boolean ownerOk = false;
         String name = closetNameTextField.getText();
-        String owner = closetNameTextField.getText();
+        String owner = closetOwnerTextField.getText();
         
+        if(name.length() != 0)
+            nameOk = true;
+        if(owner.length() != 0)
+            ownerOk = true;
         
-       addClosetSwingWorker = new AddClosetSwingWorker();
-       addClosetSwingWorker.setName(name);
-       addClosetSwingWorker.setOwner(owner);
-       addClosetSwingWorker.execute();
-       newUpdateClosetFrame.dispose();
-       
-       new AllClosetsSwingWorker().execute();
+        if(nameOk && ownerOk){
+           addClosetSwingWorker = new AddClosetSwingWorker();
+           addClosetSwingWorker.setName(name);
+           addClosetSwingWorker.setOwner(owner);
+           addClosetSwingWorker.execute();
+           newUpdateClosetFrame.dispose();
+           
+           System.out.println("current=" + currentCloset);
+           closetsComboBox.setSelectedItem(currentCloset);
+            System.out.println("get="+closetsComboBox.getSelectedItem());
+           
+           new AllClosetsSwingWorker().execute();
+        }
+        else{
+            if(!nameOk){
+                String err = bundle.getBundle(localeDirectory).getString("wrongNameMsg");
+                JOptionPane.showMessageDialog(this, err);
+                closetNameTextField.setBackground(Color.PINK);
+            }else{
+                closetNameTextField.setBackground(Color.WHITE);
+            }
+            if(!ownerOk){
+                String err = bundle.getBundle(localeDirectory).getString("wrongOwnerMsg");
+                JOptionPane.showMessageDialog(this, err);
+                closetOwnerTextField.setBackground(Color.PINK);
+            }else{
+                closetOwnerTextField.setBackground(Color.WHITE);
+            }
+        }
+        
     }//GEN-LAST:event_addUpdateClosetButtonActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
@@ -790,24 +899,71 @@ public class MainMenuFrame extends javax.swing.JFrame {
 
     private void addUpdateItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUpdateItemButtonActionPerformed
         Date added = getSqlDate(Calendar.getInstance().getTime(), 0);
+        boolean typeOk = false;
+        boolean sizeOk = false;
+        boolean genderOk = false;
+        boolean noteOk = true;
+
         String type = itemTypeTextField.getText();
         String size = itemSizeTextField.getText();
-        String gender = itemGenderTextField.getText();
-        String note = itemNoteTextField.getText();
-        
-        
-       addItemSwingWorker = new AddItemSwingWorker();
-       addItemSwingWorker.setType(type);
-       addItemSwingWorker.setSize(size);
-       addItemSwingWorker.setGender(gender);
-       addItemSwingWorker.setNote(note);
-       addItemSwingWorker.setAdded(added);
+        Gender gender = (Gender)genderComboBox.getSelectedItem();
 
-       addItemSwingWorker.execute();
-       newUpdateItemFrame.dispose();
-       
-       new AllItemsFromClosetSwingWorker().execute();
-       refreshButton.doClick();
+        String note = itemNoteTextField.getText();
+
+        if(type.length() != 0)
+        typeOk = true;
+        if(size.length() != 0)
+        sizeOk = true;
+        if(gender != null)
+        genderOk = true;
+        if(note.length() != 0)
+        noteOk = true;
+
+        if(typeOk && sizeOk && genderOk && noteOk){
+            addItemSwingWorker = new AddItemSwingWorker();
+            addItemSwingWorker.setType(type);
+            addItemSwingWorker.setSize(size);
+            addItemSwingWorker.setGender(gender);
+            addItemSwingWorker.setNote(note);
+            addItemSwingWorker.setAdded(added);
+
+            addItemSwingWorker.execute();
+            newUpdateItemFrame.dispose();
+            new AllItemsFromClosetSwingWorker().execute();
+            refreshButton.doClick();
+        }else{
+            if(!typeOk){
+                String typeMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongTypeMsg");
+                JOptionPane.showMessageDialog(this, typeMsg);
+                itemTypeTextField.setBackground(Color.PINK);
+            }
+            else{
+                itemTypeTextField.setBackground(Color.WHITE);
+            }
+            if(!sizeOk){
+                String sizeMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongSizeMsg");
+                JOptionPane.showMessageDialog(this, sizeMsg);
+                itemSizeTextField.setBackground(Color.PINK);
+            }
+            else{
+                itemSizeTextField.setBackground(Color.WHITE);
+            }
+            if(!genderOk){
+                String genderMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongGenderMsg");
+                JOptionPane.showMessageDialog(this, genderMsg);
+            }
+
+            if(!noteOk){
+                String noteMsg = bundle.getBundle("cz.muni.fi.pv168.dressroomAppGui/localization_" + local).getString("wrongNoteMsg");
+                JOptionPane.showMessageDialog(this, noteMsg);
+                itemNoteTextField.setBackground(Color.PINK);
+            }
+            else{
+                itemNoteTextField.setBackground(Color.WHITE);
+            }
+
+        }
+
     }//GEN-LAST:event_addUpdateItemButtonActionPerformed
 
     /**
@@ -855,13 +1011,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
     public static javax.swing.JComboBox closetsComboBox;
     private javax.swing.JButton deleteClosetButton;
     private javax.swing.JButton deleteItemButton;
-    private javax.swing.JTextField itemGenderTextField;
+    private javax.swing.JComboBox genderComboBox;
     private javax.swing.JTextField itemNoteTextField;
     private javax.swing.JTextField itemSizeTextField;
     private javax.swing.JLabel itemTypeLabel;
     private javax.swing.JTextField itemTypeTextField;
     private javax.swing.JTable itemsTable;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -869,6 +1024,7 @@ public class MainMenuFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JButton newClosetBtn;
     private javax.swing.JButton newItemButton;
     private javax.swing.JFrame newUpdateClosetFrame;
     private javax.swing.JLabel newUpdateClosetLabel;

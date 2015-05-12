@@ -78,8 +78,7 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try{
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "INSERT INTO ITEM (type,add_date,gender,size,note) "
@@ -96,6 +95,9 @@ public class ItemsManagerImpl implements ItemsManager{
             
             Long id = DBUtils.getId(st.getGeneratedKeys());
             item.setId(id);
+            
+            logger.info("Creating item: "+item.toString());
+            
             conn.commit();
         } catch (SQLException ex){
             String msg = "Error when inserting item into db";
@@ -120,8 +122,9 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try{
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Deleting item: "+item.toString());
+            
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "DELETE FROM item WHERE id = ?");
@@ -199,8 +202,9 @@ public class ItemsManagerImpl implements ItemsManager{
         PreparedStatement st = null;
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Updating item: "+item.toString());
+            
             conn.setAutoCommit(false);            
             st = conn.prepareStatement(
                     "UPDATE Item SET type = ?, gender = ?, size = ?, note = ? WHERE id = ?");

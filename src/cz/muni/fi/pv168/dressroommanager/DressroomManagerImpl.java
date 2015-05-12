@@ -93,8 +93,9 @@ public class DressroomManagerImpl implements DressroomManager
         PreparedStatement updateSt = null;
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Adding item " + item.toString() + " in closet: " + closet.toString());
+            
             conn.setAutoCommit(false);
             //checkIfGraveHasSpace(conn, closet);
             
@@ -138,8 +139,9 @@ public class DressroomManagerImpl implements DressroomManager
         PreparedStatement st = null;
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Removing item " + item.toString() + " from closet: " + closet.toString());
+            
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "UPDATE Item SET closetId = NULL WHERE id = ? AND closetId = ?");

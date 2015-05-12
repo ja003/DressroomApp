@@ -92,6 +92,31 @@ public class ClosetManagerImplTest {
         assertNotNull(manager.getClosetById(c2.getId()));
                 
     }
+    
+     @Test
+    public void deleteCloset2() {
+        Closet c1 = newCloset("Adam", "Adam - closet");
+        Closet c2 = newCloset("Another", "Another - closet");
+        manager.createCloset(c1);
+        manager.createCloset(c2);
+        
+        assertNotNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+
+        manager.deleteCloset(c1);
+        
+         System.out.println("closets:");
+        for(Closet c : manager.getAllClosets()){
+            System.out.println(c);
+        }
+        
+        assertNull(manager.getClosetById(c1.getId()));
+        assertNotNull(manager.getClosetById(c2.getId()));
+        
+         assertEquals(manager.getAllClosets().size(), 1);
+        
+                
+    }
 
     @Test
     public void testGetClosetById() {
@@ -105,6 +130,8 @@ public class ClosetManagerImplTest {
         assertEquals(closet, result);
         assertDeepEquals(closet, result);
     }
+    
+    
 
     /**
      * Test of getAllClosets method, of class ClosetManagerImpl.

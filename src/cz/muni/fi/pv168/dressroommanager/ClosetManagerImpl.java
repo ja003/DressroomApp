@@ -65,8 +65,9 @@ public class ClosetManagerImpl implements ClosetManager
         PreparedStatement st = null;
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Creating closet: "+closet.toString());
+            
             conn.setAutoCommit(false);
             st = conn.prepareStatement("INSERT INTO CLOSET (owner,name) VALUES (?,?)",
                     Statement.RETURN_GENERATED_KEYS);
@@ -100,13 +101,15 @@ public class ClosetManagerImpl implements ClosetManager
             throw new IllegalArgumentException("Id is null");
         }
         
+        logger.info("Removing closet: "+closet.toString());
+        
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement st = connection.prepareStatement("DELETE FROM closet WHERE id = ?")) {
+            try (PreparedStatement st = connection.prepareStatement("DELETE FROM closet WHERE ID = ?")) {
                 st.setLong(1, closet.getId());
                 st.execute();
             }
         } catch (SQLException ex) {
-            //log.error(ex.toString());
+            logger.info(ex.toString());
         }
     }
     
@@ -170,8 +173,9 @@ public class ClosetManagerImpl implements ClosetManager
         
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in 
-            // method DBUtils.closeQuietly(...) 
+            
+            logger.info("Updating closet: "+closet.toString());
+            
             conn.setAutoCommit(false);
             st = conn.prepareStatement("UPDATE closet SET "
                     + "owner=?, name=? WHERE id=?");

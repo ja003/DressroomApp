@@ -28,7 +28,6 @@ public class ClosetsComboBoxModel extends AbstractListModel implements ComboBoxM
         //return selectedClosetString;
     }
     
-    ////////////////////////////////////*********************OPRAVIT*********************//////////////////////////////////////
     @Override 
     public void setSelectedItem(Object newValue) {
             for (Closet c: closets){

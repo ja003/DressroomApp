@@ -35,8 +35,8 @@ import org.apache.commons.dbcp.BasicDataSource;
 public class MainMenuFrame extends javax.swing.JFrame {
 
     private DataSource dataSource;
-    private DressroomManagerImpl dressroomManager;
-    private ClosetManagerImpl closetManager;
+    private DressroomManagerImpl dressroomManager = new DressroomManagerImpl();
+    private ClosetManagerImpl closetManager = new ClosetManagerImpl();
     private ItemsManagerImpl itemsManager = new ItemsManagerImpl();
     private Closet currentCloset;
     private Long updateId;
@@ -47,6 +47,16 @@ public class MainMenuFrame extends javax.swing.JFrame {
     
     public MainMenuFrame() {
         initComponents();
+        
+        try{
+            dataSource = prepareDataSource();
+        }catch(SQLException e){
+            
+        }
+        
+        dressroomManager.setDataSource(dataSource);
+        closetManager.setDataSource(dataSource);
+        itemsManager.setDataSource(dataSource);
         
         
         //not working
@@ -90,7 +100,6 @@ public class MainMenuFrame extends javax.swing.JFrame {
         private String type;
         private String size;
         private Date added;
-        private String genderString;
         private Gender gender;
         private String note;
 
@@ -123,11 +132,11 @@ public class MainMenuFrame extends javax.swing.JFrame {
         @Override
         protected Item doInBackground() throws Exception {
 
-            dataSource = prepareDataSource();
-            itemsManager = new ItemsManagerImpl();
-            itemsManager.setDataSource(dataSource);
-            dressroomManager = new DressroomManagerImpl();
-            dressroomManager.setDataSource(dataSource);
+            //dataSource = prepareDataSource();
+            //itemsManager = new ItemsManagerImpl();
+            //itemsManager.setDataSource(dataSource);
+            //dressroomManager = new DressroomManagerImpl();
+            //dressroomManager.setDataSource(dataSource);
             //gender = Gender.BOTH;                   ///////////*******************FIX
             item = new Item(type, gender, size, note);
             
@@ -163,9 +172,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         @Override
         protected Closet doInBackground() throws Exception {
 
-            dataSource = prepareDataSource();
-            closetManager = new ClosetManagerImpl();
-            closetManager.setDataSource(dataSource);
+            //dataSource = prepareDataSource();
+            //closetManager = new ClosetManagerImpl();
+            //closetManager.setDataSource(dataSource);
             
             deletedCloset = (Closet)closetsComboBox.getSelectedItem();
             System.out.println("deleting:" + deletedCloset);
@@ -224,9 +233,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         @Override
         protected Closet doInBackground() throws Exception {
 
-            dataSource = prepareDataSource();
-            closetManager = new ClosetManagerImpl();
-            closetManager.setDataSource(dataSource);
+            //dataSource = prepareDataSource();
+            //closetManager = new ClosetManagerImpl();
+            //closetManager.setDataSource(dataSource);
             closet = new Closet(name, owner);
             if(!updateC)
                 closetManager.createCloset(closet);
@@ -262,9 +271,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
 
         @Override
         protected List<Closet> doInBackground() throws Exception {
-            dataSource = prepareDataSource();
-            closetManager = new ClosetManagerImpl();
-            closetManager.setDataSource(dataSource);
+            //dataSource = prepareDataSource();
+            //closetManager = new ClosetManagerImpl();
+            //closetManager.setDataSource(dataSource);
             closets = new ArrayList<>();
             try{
                 closets = closetManager.getAllClosets();
@@ -325,9 +334,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
 
         @Override
         protected List<Item> doInBackground() throws Exception {
-            dataSource = prepareDataSource();
-            dressroomManager = new DressroomManagerImpl();
-            dressroomManager.setDataSource(dataSource);
+            //dataSource = prepareDataSource();
+            //dressroomManager = new DressroomManagerImpl();
+            //dressroomManager.setDataSource(dataSource);
             items = new ArrayList<>();
             currentCloset = (Closet)closetsComboBox.getSelectedItem();
             
@@ -411,7 +420,9 @@ public class MainMenuFrame extends javax.swing.JFrame {
         refreshButton = new javax.swing.JButton();
 
         newUpdateClosetFrame.setBackground(new java.awt.Color(51, 255, 51));
+        newUpdateClosetFrame.setMaximumSize(new java.awt.Dimension(400, 270));
         newUpdateClosetFrame.setMinimumSize(new java.awt.Dimension(400, 270));
+        newUpdateClosetFrame.setPreferredSize(new java.awt.Dimension(400, 270));
 
         closetOwnerTextField.setText("jTextField1");
         closetOwnerTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -457,12 +468,12 @@ public class MainMenuFrame extends javax.swing.JFrame {
                     .addComponent(newUpdateClosetLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, newUpdateClosetFrameLayout.createSequentialGroup()
                         .addGroup(newUpdateClosetFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(closetOwnerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(closetOwnerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
                             .addComponent(closetNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(11, 11, 11)
                         .addGroup(newUpdateClosetFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(closetNameTextField)
-                            .addComponent(closetOwnerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(closetOwnerTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                            .addComponent(closetNameTextField))))
                 .addContainerGap())
         );
         newUpdateClosetFrameLayout.setVerticalGroup(
@@ -816,13 +827,10 @@ public class MainMenuFrame extends javax.swing.JFrame {
             String updateItemBtn = bundle.getBundle(localeDirectory).getString("updateItemBtnConfirm");
             addUpdateItemButton.setText(updateItemBtn);
 
-            itemsManager = new ItemsManagerImpl();
+            //itemsManager = new ItemsManagerImpl();
             Object idValue = itemsTable.getValueAt(selectedRow, 0);
             Item item = null;
-            try{
-                dataSource = prepareDataSource();
-            }catch(Exception e){
-            }
+            
             itemsManager.setDataSource(dataSource);
 
             try{
@@ -856,13 +864,8 @@ public class MainMenuFrame extends javax.swing.JFrame {
             String err = bundle.getBundle(localeDirectory).getString("noSelectedItem");
             JOptionPane.showMessageDialog(this, err);
         } else {
-            try{
-                 dataSource = prepareDataSource();
-            } catch(Exception e)
-            {
-                System.out.println("no datasource set");
-            }
-            itemsManager = new ItemsManagerImpl();
+            
+            //itemsManager = new ItemsManagerImpl();
             itemsManager.setDataSource(dataSource);
             Object idValue = itemsTable.getValueAt(selectedRow, 0);
             Item item = null;

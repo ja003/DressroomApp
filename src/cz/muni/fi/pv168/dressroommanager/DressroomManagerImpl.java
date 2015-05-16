@@ -13,8 +13,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.sql.DataSource;
 
 /**
@@ -26,7 +28,20 @@ public class DressroomManagerImpl implements DressroomManager
     private static final Logger logger = Logger.getLogger(
             ClosetManagerImpl.class.getName());
 
-    
+    private FileHandler fh;
+    public DressroomManagerImpl(){
+        try{
+        fh = new FileHandler("C:/Users/Vukmir/Dropbox/ŠKOLA/PV168/DressRoomApp/logger/DressroomManagerLogger.log");
+        logger.addHandler(fh);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        System.out.println("handler ok");
+        
+        }catch(Exception e){
+            System.out.println("handler fail");
+        }
+        
+    }
 
     private DataSource dataSource;
 

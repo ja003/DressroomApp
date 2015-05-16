@@ -20,8 +20,10 @@ import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
@@ -37,10 +39,24 @@ public class ClosetManagerImpl implements ClosetManager
     private static final Logger logger = Logger.getLogger(
             ClosetManagerImpl.class.getName());
 
-    public ClosetManagerImpl() {}
+    private FileHandler fh;
+    public ClosetManagerImpl() {
+    try{
+        fh = new FileHandler("C:/Users/Vukmir/Dropbox/ŠKOLA/PV168/DressRoomApp/logger/ClosetLogger.log");
+        logger.addHandler(fh);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        System.out.println("handler ok");
+        
+        }catch(Exception e){
+            System.out.println("handler fail");
+        }
+    
+    }
     
     public ClosetManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;
+        
     }
     
     public void setDataSource(DataSource dataSource) {

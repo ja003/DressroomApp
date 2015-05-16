@@ -25,8 +25,10 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -42,7 +44,19 @@ public class ItemsManagerImpl implements ItemsManager{
     
     private static ClosetManagerImpl closetManager;
     
+    private FileHandler fh;
     public ItemsManagerImpl( ) {
+        try{
+        fh = new FileHandler("C:/Users/Vukmir/Dropbox/ŠKOLA/PV168/DressRoomApp/logger/ItemLogger.log");
+        logger.addHandler(fh);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        System.out.println("handler ok");
+        
+        }catch(Exception e){
+            System.out.println("handler fail");
+        }
+        
         }
     
     public ItemsManagerImpl(DataSource dataSource) {
